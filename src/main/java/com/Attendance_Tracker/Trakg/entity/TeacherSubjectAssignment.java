@@ -25,10 +25,10 @@ public class TeacherSubjectAssignment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teacher_id", nullable = false, unique = true)
+    @JoinColumn(name = "teacher_id", nullable = false)
     private Teacher teacher;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subject_id", nullable = false, unique = true)
+    @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "class_section_id", nullable = false)
