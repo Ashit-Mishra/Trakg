@@ -8,20 +8,19 @@ import lombok.*;
 @Table(name = "students")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_section_id", nullable = false, unique = true)
-    private ClassSection classSection;
-    @NotBlank
-    @Column(nullable = false)
-    private String rollNo;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
+    @Column(nullable = false, unique = true, length = 20)
+    private String rollNumber;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "class_section_id", nullable = false)
+    private ClassSection classSection;
 }

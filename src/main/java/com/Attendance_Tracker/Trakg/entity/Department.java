@@ -17,11 +17,11 @@ public class Department {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Department code is required")
     @Column(nullable = false, length = 10)
     private String departmentCode;
 
-    @NotBlank
+    @NotBlank(message = "Department code is required")
     @Column(nullable = false, length = 100)
     private String departmentName;
 

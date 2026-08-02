@@ -4,10 +4,14 @@ import com.Attendance_Tracker.Trakg.entity.ClassSection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
-public interface ClassSectionRepository extends JpaRepository<ClassSection, Long> {
-    Optional<ClassSection> findByName(String name);
-
+public interface ClassSectionRepository
+        extends JpaRepository<ClassSection, Long> {
+    boolean existsBySectionNameAndSemesterId(
+            String sectionName,
+            Long semesterId
+    );
+    List<ClassSection> findBySemesterId(Long semesterId);
 }

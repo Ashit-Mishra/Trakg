@@ -10,10 +10,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class DepartmentRequest {
-    @NotBlank
+    @NotBlank(message = "Department code is required")
     private String departmentCode;
-    @NotBlank
+    @NotBlank(message = "Department code is required")
     private String departmentName;
-    @NotNull
+    @NotNull(message = "Department code is required")
     private Long academicSessionId;
 }

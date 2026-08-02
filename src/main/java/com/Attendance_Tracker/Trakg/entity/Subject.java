@@ -16,9 +16,13 @@ public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
-    @Column(nullable = false)
-    private String name;
-    @Column(nullable = false, unique = true)
-    private String code;
+    @NotBlank(message = "Subject code is required")
+    @Column(nullable = false, length = 20)
+    private String subjectCode;
+    @NotBlank(message = "Subject name is required")
+    @Column(nullable = false, length = 100)
+    private String subjectName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "semester_id", nullable = false)
+    private Semester semester;
 }
