@@ -2,7 +2,7 @@ package com.Attendance_Tracker.Trakg.controller;
 
 import com.Attendance_Tracker.Trakg.dto.AcademicSessionRequest;
 import com.Attendance_Tracker.Trakg.entity.AcademicSession;
-import com.Attendance_Tracker.Trakg.security.AcademicSessionService;
+import com.Attendance_Tracker.Trakg.service.AcademicSessionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

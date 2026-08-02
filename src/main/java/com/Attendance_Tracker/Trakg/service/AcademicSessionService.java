@@ -1,4 +1,4 @@
-package com.Attendance_Tracker.Trakg.security;
+package com.Attendance_Tracker.Trakg.service;
 
 import com.Attendance_Tracker.Trakg.dto.AcademicSessionRequest;
 import com.Attendance_Tracker.Trakg.entity.AcademicSession;
