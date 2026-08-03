@@ -13,8 +13,8 @@ import java.time.LocalDate;
                 @UniqueConstraint(
                         columnNames = {
                                 "student_id",
-                                "assignment_id",
-                                "date"
+                                "teacher_subject_assignment_id",
+                                "attendance_date"
                         }
                 )
         }
@@ -35,11 +35,11 @@ public class Attendance {
     private Student student;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignment_id", nullable = false)
+    @JoinColumn(name = "teacher_subject_assignment_id", nullable = false)
     private TeacherSubjectAssignment assignment;
 
     @Column(nullable = false)
-    private LocalDate date;
+    private LocalDate attendanceDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
