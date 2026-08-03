@@ -1,11 +1,11 @@
 package com.Attendance_Tracker.Trakg.service;
 
 import com.Attendance_Tracker.Trakg.dto.AttendanceRequest;
+import com.Attendance_Tracker.Trakg.dto.OverallAttendanceResponse;
 import com.Attendance_Tracker.Trakg.dto.StudentAttendanceRequest;
-import com.Attendance_Tracker.Trakg.entity.Attendance;
-import com.Attendance_Tracker.Trakg.entity.Student;
-import com.Attendance_Tracker.Trakg.entity.Teacher;
-import com.Attendance_Tracker.Trakg.entity.TeacherSubjectAssignment;
+import com.Attendance_Tracker.Trakg.dto.SubjectAttendanceResponse;
+import com.Attendance_Tracker.Trakg.entity.*;
+import com.Attendance_Tracker.Trakg.enums.AttendanceStatus;
 import com.Attendance_Tracker.Trakg.repository.AttendanceRepository;
 import com.Attendance_Tracker.Trakg.repository.StudentRepository;
 import com.Attendance_Tracker.Trakg.repository.TeacherRepository;
@@ -17,7 +17,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -101,6 +104,78 @@ public class AttendanceService {
     public List<Attendance> getAttendanceByAssignment(Long assignmentId){
         return attendanceRepository.findByAssignmentId(assignmentId);
     }
+    public OverallAttendanceResponse getOverallAttendance() {
 
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String userId = authentication.getName();
+
+        Student student = studentRepository
+                .findByUserUserId(userId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Student not found."));
+
+        long totalClasses = attendanceRepository.countByStudentId(student.getId());
+
+        long presentClasses = attendanceRepository.countByStudentIdAndStatus(
+                student.getId(),
+                AttendanceStatus.PRESENT);
+
+        double attendancePercentage = 0.0;
+
+        if (totalClasses > 0) {
+            attendancePercentage =
+                    (presentClasses * 100.0) / totalClasses;
+        }
+
+        return OverallAttendanceResponse.builder()
+                .presentClasses(presentClasses)
+                .totalClasses(totalClasses)
+                .attendancePercentage(attendancePercentage)
+                .build();
+    }
+    public List<SubjectAttendanceResponse> getSubjectWiseAttendance() {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+        Student student = studentRepository
+                .findByUserUserId(userId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Student not found."));
+        List<Attendance> attendanceList =
+                attendanceRepository.findByStudentId(student.getId());
+        Map<Subject, List<Attendance>> groupedAttendance =
+                attendanceList.stream()
+                        .collect(Collectors.groupingBy(
+                                attendance ->
+                                        attendance.getAssignment().getSubject()
+                        ));
+        List<SubjectAttendanceResponse> response = new ArrayList<>();
+        for (Map.Entry<Subject, List<Attendance>> entry : groupedAttendance.entrySet()) {
+
+            Subject subject = entry.getKey();
+            List<Attendance> records = entry.getValue();
+            long totalClasses = records.size();
+            long presentClasses = records.stream()
+                    .filter(attendance ->
+                            attendance.getStatus() == AttendanceStatus.PRESENT)
+                    .count();
+            double percentage = totalClasses == 0
+                    ? 0
+                    : (presentClasses * 100.0) / totalClasses;
+            response.add(
+                    SubjectAttendanceResponse.builder()
+                            .subjectCode(subject.getSubjectCode())
+                            .subjectName(subject.getSubjectName())
+                            .presentClasses(presentClasses)
+                            .totalClasses(totalClasses)
+                            .attendancePercentage(percentage)
+                            .build()
+            );
+        }
+        return response;
+    }
 
 }

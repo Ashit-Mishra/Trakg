@@ -1,6 +1,8 @@
 package com.Attendance_Tracker.Trakg.controller;
 
 import com.Attendance_Tracker.Trakg.dto.AttendanceRequest;
+import com.Attendance_Tracker.Trakg.dto.OverallAttendanceResponse;
+import com.Attendance_Tracker.Trakg.dto.SubjectAttendanceResponse;
 import com.Attendance_Tracker.Trakg.entity.Attendance;
 import com.Attendance_Tracker.Trakg.service.AttendanceService;
 import jakarta.validation.Valid;
@@ -43,4 +45,20 @@ public class AttendanceController {
                 attendanceService.getAttendanceByAssignment(assignmentId)
         );
     }
+    @GetMapping("/attendance/overall")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<OverallAttendanceResponse> getOverallAttendance() {
+        return ResponseEntity.ok(
+                attendanceService.getOverallAttendance()
+        );
+    }
+    @GetMapping("/attendance/subjects")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<List<SubjectAttendanceResponse>>
+    getSubjectWiseAttendance() {
+        return ResponseEntity.ok(
+                attendanceService.getSubjectWiseAttendance()
+        );
+    }
+
 }
