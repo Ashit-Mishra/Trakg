@@ -15,4 +15,5 @@ public interface DepartmentRepository
     boolean existsByDepartmentNameAndAcademicSessionId(String departmentName, Long academicSessionId);
 
     List<Department> findByAcademicSessionId(Long academicSessionId);
+    boolean existsByDepartmentName(String departmentName);
 }

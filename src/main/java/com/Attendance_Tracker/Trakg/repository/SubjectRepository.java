@@ -15,4 +15,6 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
             Long semesterId
     );
     List<Subject> findBySemesterId(Long semesterId);
+
+    boolean existsBySubjectCode(String subjectCode);
 }

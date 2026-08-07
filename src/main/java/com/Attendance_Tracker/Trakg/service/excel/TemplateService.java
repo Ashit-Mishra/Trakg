@@ -49,4 +49,35 @@ public class TemplateService {
         workbook.close();
         return new ByteArrayInputStream(outputStream.toByteArray());
     }
+    public ByteArrayInputStream generateDepartmentTemplate()
+            throws IOException {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Departments");
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("Department Name");
+        sheet.autoSizeColumn(0);
+        ByteArrayOutputStream outputStream =
+                new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return new ByteArrayInputStream(
+                outputStream.toByteArray());
+    }
+    public ByteArrayInputStream generateSubjectTemplate() throws IOException{
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Subjects");
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("Subject Name");
+        header.createCell(1).setCellValue("Subject Code");
+        header.createCell(2).setCellValue("Semester");
+        for (int i = 0; i < 3; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        ByteArrayOutputStream outputStream =
+                new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return new ByteArrayInputStream(
+                outputStream.toByteArray());
+    }
 }
