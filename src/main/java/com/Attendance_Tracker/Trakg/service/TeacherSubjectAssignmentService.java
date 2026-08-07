@@ -5,6 +5,9 @@ import com.Attendance_Tracker.Trakg.entity.ClassSection;
 import com.Attendance_Tracker.Trakg.entity.Subject;
 import com.Attendance_Tracker.Trakg.entity.Teacher;
 import com.Attendance_Tracker.Trakg.entity.TeacherSubjectAssignment;
+import com.Attendance_Tracker.Trakg.exception.BadRequestException;
+import com.Attendance_Tracker.Trakg.exception.DuplicateResourceException;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
 import com.Attendance_Tracker.Trakg.repository.ClassSectionRepository;
 import com.Attendance_Tracker.Trakg.repository.SubjectRepository;
 import com.Attendance_Tracker.Trakg.repository.TeacherRepository;
@@ -30,30 +33,30 @@ public class TeacherSubjectAssignmentService {
 
         Teacher teacher = teacherRepository.findById(request.getTeacherId())
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Teacher not found."));
+                        new ResourceNotFoundException("Teacher not found."));
         Subject subject = subjectRepository.findById(request.getSubjectId())
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Subject not found."));
+                        new ResourceNotFoundException("Subject not found."));
         ClassSection classSection = classSectionRepository.findById(request.getClassSectionId())
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Class Section not found."));
+                        new ResourceNotFoundException("Class Section not found."));
         if (assignmentRepository.existsByTeacherIdAndSubjectIdAndClassSectionId(
                 teacher.getId(),
                 subject.getId(),
                 classSection.getId())) {
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                     "Assignment already exists.");
         }
         // Teacher and Subject must belong to same department
         if (!teacher.getDepartment().getId().equals(
                 subject.getSemester().getDepartment().getId())) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                     "Teacher and Subject belong to different departments.");
         }
         // Subject and Class Section must belong to same semester
         if (!subject.getSemester().getId().equals(
                 classSection.getSemester().getId())) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                     "Subject and Class Section belong to different semesters.");
         }
         TeacherSubjectAssignment assignment =
@@ -68,7 +71,7 @@ public class TeacherSubjectAssignmentService {
     public TeacherSubjectAssignment getAssignment(Long id) {
         return assignmentRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Assignment not found."));
+                        new ResourceNotFoundException("Assignment not found."));
     }
     public List<TeacherSubjectAssignment> getAllAssignments() {
         return assignmentRepository.findAll();

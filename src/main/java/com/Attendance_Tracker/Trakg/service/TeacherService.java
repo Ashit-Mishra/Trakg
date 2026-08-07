@@ -5,6 +5,8 @@ import com.Attendance_Tracker.Trakg.entity.Department;
 import com.Attendance_Tracker.Trakg.entity.Teacher;
 import com.Attendance_Tracker.Trakg.entity.User;
 import com.Attendance_Tracker.Trakg.enums.Role;
+import com.Attendance_Tracker.Trakg.exception.DuplicateResourceException;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
 import com.Attendance_Tracker.Trakg.repository.DepartmentRepository;
 import com.Attendance_Tracker.Trakg.repository.TeacherRepository;
 import com.Attendance_Tracker.Trakg.repository.UserRepository;
@@ -28,14 +30,14 @@ public class TeacherService {
     public Teacher createTeacher(TeacherRequest request) {
 
         if (userRepository.existsByUserId(request.getUserId())) {
-            throw new IllegalArgumentException("User ID already exists.");
+            throw new DuplicateResourceException("User ID already exists.");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists.");
+            throw new DuplicateResourceException("Email already exists.");
         }
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Department not found."));
+                        new ResourceNotFoundException("Department not found."));
 
         User user = User.builder()
                 .userId(request.getUserId())
@@ -56,7 +58,7 @@ public class TeacherService {
     public Teacher getTeacher(Long id) {
         return teacherRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Teacher not found."));
+                        new ResourceNotFoundException("Teacher not found."));
     }
     public List<Teacher> getAllTeachers() {
         return teacherRepository.findAll();

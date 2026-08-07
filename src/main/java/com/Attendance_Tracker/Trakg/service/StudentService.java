@@ -5,6 +5,8 @@ import com.Attendance_Tracker.Trakg.entity.ClassSection;
 import com.Attendance_Tracker.Trakg.entity.Student;
 import com.Attendance_Tracker.Trakg.entity.User;
 import com.Attendance_Tracker.Trakg.enums.Role;
+import com.Attendance_Tracker.Trakg.exception.DuplicateResourceException;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
 import com.Attendance_Tracker.Trakg.repository.ClassSectionRepository;
 import com.Attendance_Tracker.Trakg.repository.StudentRepository;
 import com.Attendance_Tracker.Trakg.repository.UserRepository;
@@ -28,18 +30,18 @@ public class StudentService {
     public Student createStudent(StudentRequest request) {
 
         if (userRepository.existsByUserId(request.getUserId())) {
-            throw new IllegalArgumentException("User ID already exists.");
+            throw new DuplicateResourceException("User ID already exists.");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists.");
+            throw new DuplicateResourceException("Email already exists.");
         }
         if (studentRepository.existsByRollNumber(request.getRollNumber())) {
-            throw new IllegalArgumentException("Roll number already exists.");
+            throw new DuplicateResourceException("Roll number already exists.");
         }
         ClassSection classSection = classSectionRepository
                 .findById(request.getClassSectionId())
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Class section not found."));
+                        new ResourceNotFoundException("Class section not found."));
         User user = User.builder()
                 .userId(request.getUserId())
                 .password(passwordEncoder.encode("Password@123"))
@@ -59,7 +61,7 @@ public class StudentService {
     public Student getStudent(Long id) {
         return studentRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Student not found."));
+                        new ResourceNotFoundException("Student not found."));
     }
     public List<Student> getAllStudents() {
         return studentRepository.findAll();

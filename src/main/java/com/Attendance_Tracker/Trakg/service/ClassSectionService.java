@@ -3,6 +3,8 @@ package com.Attendance_Tracker.Trakg.service;
 import com.Attendance_Tracker.Trakg.dto.ClassSectionRequest;
 import com.Attendance_Tracker.Trakg.entity.ClassSection;
 import com.Attendance_Tracker.Trakg.entity.Semester;
+import com.Attendance_Tracker.Trakg.exception.DuplicateResourceException;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
 import com.Attendance_Tracker.Trakg.repository.ClassSectionRepository;
 import com.Attendance_Tracker.Trakg.repository.SemesterRepository;
 import jakarta.transaction.Transactional;
@@ -21,11 +23,11 @@ public class ClassSectionService {
     public ClassSection createClassSection(ClassSectionRequest request) {
         Semester semester = semesterRepository.findById(request.getSemesterId())
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Semester not found."));
+                        new ResourceNotFoundException("Semester not found."));
         if (classSectionRepository.existsBySectionNameAndSemesterId(
                 request.getSectionName(),
                 semester.getId())) {
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                     "Section already exists for this semester.");
         }
         ClassSection classSection = ClassSection.builder()
@@ -37,7 +39,7 @@ public class ClassSectionService {
     public ClassSection getClassSection(Long id) {
         return classSectionRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Class section not found."));
+                        new ResourceNotFoundException("Class section not found."));
     }
     public List<ClassSection> getAllClassSections() {
         return classSectionRepository.findAll();

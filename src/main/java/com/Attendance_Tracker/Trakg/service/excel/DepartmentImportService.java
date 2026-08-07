@@ -3,6 +3,8 @@ package com.Attendance_Tracker.Trakg.service.excel;
 import com.Attendance_Tracker.Trakg.dto.excel.ImportError;
 import com.Attendance_Tracker.Trakg.dto.excel.ImportResponse;
 import com.Attendance_Tracker.Trakg.entity.Department;
+import com.Attendance_Tracker.Trakg.exception.BadRequestException;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
 import com.Attendance_Tracker.Trakg.repository.DepartmentRepository;
 import com.Attendance_Tracker.Trakg.util.ExcelReader;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +27,11 @@ public class DepartmentImportService {
     
     public ImportResponse importDepartments(MultipartFile file){
         if (file.isEmpty()) {
-            throw new IllegalArgumentException("Please upload an Excel file.");
+            throw new ResourceNotFoundException("Please upload an Excel file.");
         }
         String fileName = file.getOriginalFilename();
         if (fileName == null || !fileName.endsWith(".xlsx")) {
-            throw new IllegalArgumentException("Only .xlsx files are supported.");
+            throw new BadRequestException("Only .xlsx files are supported.");
         }
         List<ImportError> errors = new ArrayList<>();
 

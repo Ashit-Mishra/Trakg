@@ -3,6 +3,8 @@ package com.Attendance_Tracker.Trakg.service;
 import com.Attendance_Tracker.Trakg.dto.DepartmentRequest;
 import com.Attendance_Tracker.Trakg.entity.AcademicSession;
 import com.Attendance_Tracker.Trakg.entity.Department;
+import com.Attendance_Tracker.Trakg.exception.DuplicateResourceException;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
 import com.Attendance_Tracker.Trakg.repository.AcademicSessionRepository;
 import com.Attendance_Tracker.Trakg.repository.DepartmentRepository;
 import jakarta.transaction.Transactional;
@@ -20,15 +22,10 @@ public class DepartmentService {
     @Transactional
     public Department createDepartment(DepartmentRequest request){
         AcademicSession session = academicSessionRepository.findById(request.getAcademicSessionId())
-                .orElseThrow(()->new IllegalArgumentException("Academic session not found"));
+                .orElseThrow(()->new ResourceNotFoundException("Academic session not found"));
         if(departmentRepository.existsByDepartmentCodeAndAcademicSessionId
                 (request.getDepartmentCode(), session.getId())) {
-            throw new IllegalArgumentException(
-                    "Department code already exists in this academic session.");
-        }
-        if (departmentRepository.existsByDepartmentNameAndAcademicSessionId
-                (request.getDepartmentName(), session.getId())){
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                     "Department code already exists in this academic session.");
         }
         Department department = Department.builder()
@@ -44,7 +41,7 @@ public class DepartmentService {
 
         return departmentRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Department not found."));
+                        new ResourceNotFoundException("Department not found."));
     }
     public List<Department> getAllDepartments() {
         return departmentRepository.findAll();

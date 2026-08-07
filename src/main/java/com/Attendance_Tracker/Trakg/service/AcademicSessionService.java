@@ -2,6 +2,8 @@ package com.Attendance_Tracker.Trakg.service;
 
 import com.Attendance_Tracker.Trakg.dto.AcademicSessionRequest;
 import com.Attendance_Tracker.Trakg.entity.AcademicSession;
+import com.Attendance_Tracker.Trakg.exception.DuplicateResourceException;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
 import com.Attendance_Tracker.Trakg.repository.AcademicSessionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ public class AcademicSessionService {
             AcademicSessionRequest request) {
 
         if (repository.existsBySessionName(request.getSessionName())) {
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                     "Academic session already exists."
             );
         }
@@ -36,7 +38,7 @@ public class AcademicSessionService {
 
         AcademicSession session = repository.findById(sessionId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Academic session not found."));
+                        new ResourceNotFoundException("Academic session not found."));
         if (session.isActive()) {
             return session;
         }
@@ -50,7 +52,7 @@ public class AcademicSessionService {
     }
     public AcademicSession getActiveSession(){
         return repository.findByActiveTrue()
-                .orElseThrow(()-> new IllegalStateException("No active academic session"));
+                .orElseThrow(()-> new ResourceNotFoundException("No active academic session"));
     }
     public List<AcademicSession> getAllSessions(){
         return repository.findAll();

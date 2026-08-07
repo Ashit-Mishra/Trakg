@@ -2,6 +2,7 @@ package com.Attendance_Tracker.Trakg.service;
 
 import com.Attendance_Tracker.Trakg.dto.UserResponse;
 import com.Attendance_Tracker.Trakg.entity.User;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
 import com.Attendance_Tracker.Trakg.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class UserService {
 
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("User not found."));
+                        new ResourceNotFoundException("User not found."));
         return mapToUserResponse(user);
     }
     @Transactional
@@ -33,7 +34,7 @@ public class UserService {
 
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("User not found."));
+                        new ResourceNotFoundException("User not found."));
         user.setEnabled(false);
         User updatedUser = userRepository.save(user);
         return mapToUserResponse(updatedUser);
@@ -43,7 +44,7 @@ public class UserService {
 
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("User not found."));
+                        new ResourceNotFoundException("User not found."));
         user.setEnabled(true);
         User updatedUser = userRepository.save(user);
         return mapToUserResponse(updatedUser);

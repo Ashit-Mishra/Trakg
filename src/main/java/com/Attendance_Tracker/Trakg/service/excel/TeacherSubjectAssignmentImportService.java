@@ -6,6 +6,8 @@ import com.Attendance_Tracker.Trakg.entity.ClassSection;
 import com.Attendance_Tracker.Trakg.entity.Subject;
 import com.Attendance_Tracker.Trakg.entity.Teacher;
 import com.Attendance_Tracker.Trakg.entity.TeacherSubjectAssignment;
+import com.Attendance_Tracker.Trakg.exception.BadRequestException;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
 import com.Attendance_Tracker.Trakg.repository.ClassSectionRepository;
 import com.Attendance_Tracker.Trakg.repository.SubjectRepository;
 import com.Attendance_Tracker.Trakg.repository.TeacherRepository;
@@ -34,11 +36,11 @@ public class TeacherSubjectAssignmentImportService {
 
     public ImportResponse importTeacherSubjectAssignment(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new IllegalArgumentException("Please upload an Excel file.");
+            throw new ResourceNotFoundException("Please upload an Excel file.");
         }
         String fileName = file.getOriginalFilename();
         if (fileName == null || !fileName.endsWith(".xlsx")) {
-            throw new IllegalArgumentException("Only .xlsx files are supported.");
+            throw new BadRequestException("Only .xlsx files are supported.");
         }
         List<ImportError> errors = new ArrayList<>();
         int totalRows = 0;

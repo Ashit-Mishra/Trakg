@@ -3,6 +3,8 @@ package com.Attendance_Tracker.Trakg.service;
 import com.Attendance_Tracker.Trakg.dto.SubjectRequest;
 import com.Attendance_Tracker.Trakg.entity.Semester;
 import com.Attendance_Tracker.Trakg.entity.Subject;
+import com.Attendance_Tracker.Trakg.exception.DuplicateResourceException;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
 import com.Attendance_Tracker.Trakg.repository.SemesterRepository;
 import com.Attendance_Tracker.Trakg.repository.SubjectRepository;
 import jakarta.transaction.Transactional;
@@ -23,11 +25,11 @@ public class SubjectService {
 
         Semester semester = semesterRepository.findById(request.getSemesterId())
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Semester not found."));
+                        new ResourceNotFoundException("Semester not found."));
         if (subjectRepository.existsBySubjectCodeAndSemesterId(
                 request.getSubjectCode(),
                 semester.getId())) {
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                     "Subject code already exists in this semester.");
         }
         Subject subject = Subject.builder()
@@ -40,7 +42,7 @@ public class SubjectService {
     public Subject getSubject(Long id) {
         return subjectRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Subject not found."));
+                        new ResourceNotFoundException("Subject not found."));
     }
     public List<Subject> getAllSubjects() {
         return subjectRepository.findAll();

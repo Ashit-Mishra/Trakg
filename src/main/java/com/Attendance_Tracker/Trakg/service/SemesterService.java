@@ -3,6 +3,8 @@ package com.Attendance_Tracker.Trakg.service;
 import com.Attendance_Tracker.Trakg.dto.SemesterRequest;
 import com.Attendance_Tracker.Trakg.entity.Department;
 import com.Attendance_Tracker.Trakg.entity.Semester;
+import com.Attendance_Tracker.Trakg.exception.DuplicateResourceException;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
 import com.Attendance_Tracker.Trakg.repository.DepartmentRepository;
 import com.Attendance_Tracker.Trakg.repository.SemesterRepository;
 import jakarta.transaction.Transactional;
@@ -21,11 +23,11 @@ public class SemesterService {
     public Semester createSemester(SemesterRequest request) {
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Department not found."));
+                        new ResourceNotFoundException("Department not found."));
         if (semesterRepository.existsBySemesterNumberAndDepartmentId(
                 request.getSemesterNumber(),
                 department.getId())) {
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                     "Semester already exists for this department.");
         }
         Semester semester = Semester.builder()
@@ -37,7 +39,7 @@ public class SemesterService {
     public Semester getSemester(Long id) {
         return semesterRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Semester not found."));
+                        new ResourceNotFoundException("Semester not found."));
     }
     public List<Semester> getAllSemesters() {
         return semesterRepository.findAll();

@@ -6,6 +6,9 @@ import com.Attendance_Tracker.Trakg.dto.StudentAttendanceRequest;
 import com.Attendance_Tracker.Trakg.dto.SubjectAttendanceResponse;
 import com.Attendance_Tracker.Trakg.entity.*;
 import com.Attendance_Tracker.Trakg.enums.AttendanceStatus;
+import com.Attendance_Tracker.Trakg.exception.DuplicateResourceException;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
+import com.Attendance_Tracker.Trakg.exception.UnauthorizedException;
 import com.Attendance_Tracker.Trakg.repository.AttendanceRepository;
 import com.Attendance_Tracker.Trakg.repository.StudentRepository;
 import com.Attendance_Tracker.Trakg.repository.TeacherRepository;
@@ -44,19 +47,19 @@ public class AttendanceService {
         Teacher loggedInTeacher = teacherRepository
                 .findByUserUserId(userId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Teacher not found."));
+                        new ResourceNotFoundException("Teacher not found."));
 
         // Find assignment
         TeacherSubjectAssignment assignment =
                 assignmentRepository.findById(request.getAssignmentId())
                         .orElseThrow(() ->
-                                new IllegalArgumentException("Assignment not found."));
+                                new ResourceNotFoundException("Assignment not found."));
 
         // Authorization Check
         if (!assignment.getTeacher().getId()
                 .equals(loggedInTeacher.getId())) {
 
-            throw new AccessDeniedException(
+            throw new UnauthorizedException(
                     "You are not allowed to mark attendance for this assignment.");
         }
 
@@ -65,14 +68,14 @@ public class AttendanceService {
 
             Student student = studentRepository.findById(studentRequest.getStudentId())
                     .orElseThrow(() ->
-                            new IllegalArgumentException(
+                            new ResourceNotFoundException(
                                     "Student not found: " + studentRequest.getStudentId()));
 
             // Student must belong to the same class section
             if (!student.getClassSection().getId()
                     .equals(assignment.getClassSection().getId())) {
 
-                throw new IllegalArgumentException(
+                throw new ResourceNotFoundException(
                         "Student does not belong to the assigned class section.");
             }
 
@@ -83,7 +86,7 @@ public class AttendanceService {
                             assignment.getId(),
                             request.getAttendanceDate())) {
 
-                throw new IllegalArgumentException(
+                throw new DuplicateResourceException(
                         "Attendance already marked for student: "
                                 + student.getRollNumber());
             }
@@ -143,7 +146,7 @@ public class AttendanceService {
         Student student = studentRepository
                 .findByUserUserId(userId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Student not found."));
+                        new ResourceNotFoundException("Student not found."));
         List<Attendance> attendanceList =
                 attendanceRepository.findByStudentId(student.getId());
         Map<Subject, List<Attendance>> groupedAttendance =

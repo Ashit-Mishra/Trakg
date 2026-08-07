@@ -7,6 +7,8 @@ import com.Attendance_Tracker.Trakg.dto.UpdateAttendanceRequest;
 import com.Attendance_Tracker.Trakg.entity.Attendance;
 import com.Attendance_Tracker.Trakg.entity.Teacher;
 import com.Attendance_Tracker.Trakg.entity.TeacherSubjectAssignment;
+import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
+import com.Attendance_Tracker.Trakg.exception.UnauthorizedException;
 import com.Attendance_Tracker.Trakg.repository.AttendanceRepository;
 import com.Attendance_Tracker.Trakg.repository.TeacherRepository;
 import com.Attendance_Tracker.Trakg.repository.TeacherSubjectAssignmentRepository;
@@ -38,7 +40,7 @@ public class TeacherDashboardService {
         Teacher teacher = teacherRepository
                 .findByUserUserId(userId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Teacher not found."));
+                        new ResourceNotFoundException("Teacher not found."));
 
         return TeacherProfileResponse.builder()
                 .userId(teacher.getUser().getUserId())
@@ -55,7 +57,7 @@ public class TeacherDashboardService {
         Teacher teacher = teacherRepository
                 .findByUserUserId(userId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Teacher not found."));
+                        new ResourceNotFoundException("Teacher not found."));
 
         List<TeacherSubjectAssignment> assignments =
                 assignmentRepository.findByTeacherId(teacher.getId());
@@ -84,14 +86,14 @@ public class TeacherDashboardService {
         Teacher teacher = teacherRepository
                 .findByUserUserId(userId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Teacher not found."));
+                        new ResourceNotFoundException("Teacher not found."));
         TeacherSubjectAssignment assignment = assignmentRepository
                 .findById(assignmentId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Assignment not found."));
+                        new ResourceNotFoundException("Assignment not found."));
         // Authorization check
         if (!assignment.getTeacher().getId().equals(teacher.getId())) {
-            throw new AccessDeniedException(
+            throw new UnauthorizedException(
                     "You are not authorized to view this attendance.");
         }
         List<Attendance> attendanceList =
@@ -124,16 +126,16 @@ public class TeacherDashboardService {
         Teacher teacher = teacherRepository
                 .findByUserUserId(userId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Teacher not found."));
+                        new ResourceNotFoundException("Teacher not found."));
         Attendance attendance = attendanceRepository
                 .findById(attendanceId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Attendance not found."));
+                        new ResourceNotFoundException("Attendance not found."));
         TeacherSubjectAssignment assignment =
                 attendance.getAssignment();
         if (!assignment.getTeacher().getId().equals(teacher.getId())) {
 
-            throw new AccessDeniedException(
+            throw new UnauthorizedException(
                     "You are not authorized to edit this attendance.");
         }
         attendance.setStatus(request.getStatus());
