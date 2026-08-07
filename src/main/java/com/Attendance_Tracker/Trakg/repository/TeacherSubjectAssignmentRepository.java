@@ -1,5 +1,8 @@
 package com.Attendance_Tracker.Trakg.repository;
 
+import com.Attendance_Tracker.Trakg.entity.ClassSection;
+import com.Attendance_Tracker.Trakg.entity.Subject;
+import com.Attendance_Tracker.Trakg.entity.Teacher;
 import com.Attendance_Tracker.Trakg.entity.TeacherSubjectAssignment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -22,5 +25,9 @@ public interface TeacherSubjectAssignmentRepository
     Optional<TeacherSubjectAssignment>
     findBySubjectIdAndClassSectionId(Long subjectId, Long classSectionId);
     List<TeacherSubjectAssignment>
-    findByTeacherIdAndClassSectionId(Long teacherId, Long classSectionId);
+    findByTeacherIdAndClassSectionId(Long teacherId, Long classSectionId);boolean existsByTeacherAndSubjectAndClassSection(
+            Teacher teacher,
+            Subject subject,
+            ClassSection classSection
+    );
 }

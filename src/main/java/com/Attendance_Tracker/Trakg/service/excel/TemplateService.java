@@ -80,4 +80,38 @@ public class TemplateService {
         return new ByteArrayInputStream(
                 outputStream.toByteArray());
     }
+    public ByteArrayInputStream generateClassSectionTemplate() throws IOException{
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("ClassSections");
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("Section Name");
+        header.createCell(1).setCellValue("Department ID");
+        header.createCell(2).setCellValue("Semester ID");
+        for (int i = 0; i < 3; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        ByteArrayOutputStream outputStream =
+                new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return new ByteArrayInputStream(
+                outputStream.toByteArray());
+    }
+    public ByteArrayInputStream generateTeacherSubjectAssignmentTemplate() throws IOException{
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Assignments");
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("Teacher ID");
+        header.createCell(1).setCellValue("Subject ID");
+        header.createCell(2).setCellValue("Class Section ID");
+        for (int i = 0; i < 3; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        ByteArrayOutputStream outputStream =
+                new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return new ByteArrayInputStream(
+                outputStream.toByteArray());
+    }
 }

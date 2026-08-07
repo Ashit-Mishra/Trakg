@@ -14,4 +14,5 @@ public interface ClassSectionRepository
             Long semesterId
     );
     List<ClassSection> findBySemesterId(Long semesterId);
+    boolean existsBySectionName(String sectionName);
 }

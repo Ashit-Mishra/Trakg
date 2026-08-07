@@ -38,6 +38,10 @@ public class ClassSection {
     @JoinColumn(name = "semester_id", nullable = false)
     private Semester semester;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
+
     @OneToMany(mappedBy = "classSection")
     private List<Student> students = new ArrayList<>();
 
