@@ -31,4 +31,22 @@ public class TemplateService {
         return new ByteArrayInputStream(outputStream.toByteArray());
 
     }
+    public ByteArrayInputStream generateTeacherTemplate() throws IOException {
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Teachers");
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("User ID");
+        header.createCell(1).setCellValue("Name");
+        header.createCell(2).setCellValue("Email");
+        header.createCell(3).setCellValue("Department ID");
+        header.createCell(4).setCellValue("Designation");
+        for (int i = 0; i < 5; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return new ByteArrayInputStream(outputStream.toByteArray());
+    }
 }

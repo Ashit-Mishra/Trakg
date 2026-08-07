@@ -15,6 +15,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +28,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class StudentImportService {
+    private static final Logger logger =
+            LoggerFactory.getLogger(StudentImportService.class);
 
     private final StudentRepository studentRepository;
     private final UserRepository userRepository;
@@ -34,6 +38,13 @@ public class StudentImportService {
 
 
     public  ImportResponse importStudents(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Please upload an Excel file.");
+        }
+        String fileName = file.getOriginalFilename();
+        if (fileName == null || !fileName.endsWith(".xlsx")) {
+            throw new IllegalArgumentException("Only .xlsx files are supported.");
+        }
         List<ImportError> errors = new ArrayList<>();
         int totalRows = 0;
         int importedRows = 0;
