@@ -14,4 +14,6 @@ public interface AcademicSessionRepository
     Optional<AcademicSession> findByActiveTrue();
 
     boolean existsBySessionName(String sessionName);
+
+    AcademicSession findBySessionName(String sessionName);
 }

@@ -12,8 +12,8 @@ import lombok.*;
 public class DepartmentRequest {
     @NotBlank(message = "Department code is required")
     private String departmentCode;
-    @NotBlank(message = "Department code is required")
+    @NotBlank(message = "Department Name is required")
     private String departmentName;
-    @NotNull(message = "Department code is required")
+    @NotNull(message = "Academic Session id is required")
     private Long academicSessionId;
 }

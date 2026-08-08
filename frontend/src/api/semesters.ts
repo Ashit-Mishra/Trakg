@@ -1,21 +1,55 @@
-import { apiClient } from './client';
-import { Semester } from '../types';
+import { apiClient } from "./client";
+
+export interface SemesterRequest {
+    semesterNumber: number;
+    departmentId: number;
+}
+
+export interface Semester {
+    id: number;
+    semesterNumber: number;
+    department: {
+        id: number;
+        departmentCode: string;
+        departmentName: string;
+    };
+}
 
 export const getSemesters = async (): Promise<Semester[]> => {
-  const { data } = await apiClient.get('/api/semesters');
-  return data;
+    const { data } = await apiClient.get<Semester[]>(
+        "/api/admin/semesters"
+    );
+
+    return data;
 };
 
-export const createSemester = async (semester: Partial<Semester>): Promise<Semester> => {
-  const { data } = await apiClient.post('/api/semesters', semester);
-  return data;
+export const getSemester = async (
+    id: string
+): Promise<Semester> => {
+    const { data } = await apiClient.get<Semester>(
+        `/api/admin/semesters/${id}`
+    );
+
+    return data;
 };
 
-export const updateSemester = async (id: string, semester: Partial<Semester>): Promise<Semester> => {
-  const { data } = await apiClient.put(`/api/semesters/${id}`, semester);
-  return data;
+export const createSemester = async (
+    request: SemesterRequest
+): Promise<Semester> => {
+    const { data } = await apiClient.post<Semester>(
+        "/api/admin/semesters",
+        request
+    );
+
+    return data;
 };
 
-export const deleteSemester = async (id: string): Promise<void> => {
-  await apiClient.delete(`/api/semesters/${id}`);
+export const getSemestersByDepartment = async (
+    departmentId: string
+): Promise<Semester[]> => {
+    const { data } = await apiClient.get<Semester[]>(
+        `/api/admin/semesters/department/${departmentId}`
+    );
+
+    return data;
 };

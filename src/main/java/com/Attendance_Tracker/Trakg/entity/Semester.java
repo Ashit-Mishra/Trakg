@@ -1,5 +1,7 @@
 package com.Attendance_Tracker.Trakg.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -30,5 +32,6 @@ public class Semester {
     @OneToMany(mappedBy = "semester")
     private List<Subject> subjects = new ArrayList<>();
     @OneToMany(mappedBy = "semester")
+    @JsonIgnore
     private List<ClassSection> classSections = new ArrayList<>();
 }

@@ -18,11 +18,11 @@ public class Department {
     private Long id;
 
     @NotBlank(message = "Department code is required")
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 10, unique = true)
     private String departmentCode;
 
     @NotBlank(message = "Department code is required")
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String departmentName;
 
     @ManyToOne(fetch = FetchType.LAZY)

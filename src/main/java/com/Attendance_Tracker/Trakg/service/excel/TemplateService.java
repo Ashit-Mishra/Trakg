@@ -54,14 +54,19 @@ public class TemplateService {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Departments");
         Row header = sheet.createRow(0);
-        header.createCell(0).setCellValue("Department Name");
-        sheet.autoSizeColumn(0);
+        header.createCell(0).setCellValue("Department Code");
+        header.createCell(1).setCellValue("Department Name");
+        header.createCell(2).setCellValue("Academic Session");
+        for (int i = 0; i < 3; i++) {
+            sheet.autoSizeColumn(i);
+        }
         ByteArrayOutputStream outputStream =
                 new ByteArrayOutputStream();
         workbook.write(outputStream);
         workbook.close();
         return new ByteArrayInputStream(
-                outputStream.toByteArray());
+                outputStream.toByteArray()
+        );
     }
     public ByteArrayInputStream generateSubjectTemplate() throws IOException{
         Workbook workbook = new XSSFWorkbook();
@@ -85,8 +90,8 @@ public class TemplateService {
         Sheet sheet = workbook.createSheet("ClassSections");
         Row header = sheet.createRow(0);
         header.createCell(0).setCellValue("Section Name");
-        header.createCell(1).setCellValue("Department ID");
-        header.createCell(2).setCellValue("Semester ID");
+        header.createCell(1).setCellValue("Department");
+        header.createCell(2).setCellValue("Semester");
         for (int i = 0; i < 3; i++) {
             sheet.autoSizeColumn(i);
         }

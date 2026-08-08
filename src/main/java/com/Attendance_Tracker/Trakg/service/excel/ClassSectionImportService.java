@@ -73,10 +73,10 @@ public class ClassSectionImportService {
 
         try {
             String sectionName = ExcelReader.getString(row, 0);
-            Long departmentId = ExcelReader.getLong(row, 1);
+            String departmentCode = ExcelReader.getString(row, 1);
             Long semesterId = ExcelReader.getLong(row, 2);
             if (sectionName.isBlank()
-                    || departmentId == null
+                    || departmentCode.isBlank()
                     || semesterId == null) {
                 errors.add(
                         ImportError.builder()
@@ -96,13 +96,13 @@ public class ClassSectionImportService {
                 return false;
             }
             Department department =
-                    departmentRepository.findById(departmentId)
-                            .orElse(null);
+                    departmentRepository.findByDepartmentCode(departmentCode)
+                    ;
             if (department == null) {
                 errors.add(
                         ImportError.builder()
                                 .row(row.getRowNum() + 1)
-                                .message("Invalid Department ID.")
+                                .message("Invalid Department Code.")
                                 .build()
                 );
                 return false;

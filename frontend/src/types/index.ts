@@ -25,23 +25,28 @@ export interface User {
 
 
 export interface AcademicSession {
-  id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  isActive: boolean;
+    id: number;
+    sessionName: string;
+    startDate: string;
+    active: boolean;
 }
 
 export interface Department {
-  id: string;
-  name: string;
-  code: string;
+    id: number;
+    departmentCode: string;
+    departmentName: string;
+    academicSession: AcademicSession;
 }
 
 export interface Semester {
-  id: string;
-  name: string;
-  number: number;
+    id: number;
+    semesterNumber: number;
+    semesterName: string;
+    department: {
+        id: number;
+        departmentCode: string;
+        departmentName: string;
+    };
 }
 
 export interface Subject {
@@ -53,9 +58,10 @@ export interface Subject {
 }
 
 export interface ClassSection {
-  id: string;
-  name: string;
-  capacity: number;
+    id: number;
+    sectionName: string;
+    semester: Semester;
+    department: Department;
 }
 
 export interface Teacher {
@@ -67,13 +73,10 @@ export interface Teacher {
 }
 
 export interface Student {
-  id: string;
-  userId: string;
-  departmentId: string;
-  semesterId: string;
-  classSectionId: string;
-  rollNumber: string;
-  user?: User;
+    id: number;
+    rollNumber: string;
+    user: User;
+    classSection: ClassSection;
 }
 
 export interface TeacherAssignment {

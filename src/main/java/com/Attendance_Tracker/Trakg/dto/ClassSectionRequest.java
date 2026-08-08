@@ -13,7 +13,8 @@ public class ClassSectionRequest {
 
     @NotBlank
     private String sectionName;
-
+    @NotNull(message = "Department id is required")
+    private Long departmentId;
     @NotNull
     private Long semesterId;
 }
