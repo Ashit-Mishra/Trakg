@@ -30,6 +30,12 @@ public class AuthService {
         String token = jwtService.generateToken(userDetails);
         return LoginResponse.builder()
                 .token(token)
+                .userId(userDetails.getUsername())
+                .role(userDetails.getAuthorities()
+                .stream()
+                .findFirst()
+                .map(Object::toString)
+                .orElse(""))
                 .build();
     }
 }
