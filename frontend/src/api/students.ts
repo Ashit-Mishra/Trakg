@@ -1,122 +1,123 @@
 import { apiClient } from "./client";
-import { Student } from "../types";
 
-export interface StudentRequest {
-    userId: string;
+export interface Student {
+  id: number;
+  rollNumber: string;
+
+  user?: {
+    id: number;
+    userId?: string;
     name: string;
     email: string;
-    rollNumber: string;
-    classSectionId: number;
+    isActive: boolean;
+  };
+
+  classSection?: {
+    id: number;
+    sectionName: string;
+
+    semester?: {
+      id: number;
+      semesterNumber: number;
+    };
+
+    department?: {
+      id: number;
+      departmentCode: string;
+      departmentName: string;
+    };
+  };
 }
 
-export interface ImportResponse {
-    success?: boolean;
-    message?: string;
-    importedCount?: number;
-    failedCount?: number;
+export interface StudentRequest {
+  userId: string;
+  name: string;
+  email: string;
+  rollNumber: string;
+  classSectionId: number;
 }
 
-/*
- * Get all students
- */
 export const getStudents = async (): Promise<Student[]> => {
-    const { data } = await apiClient.get<Student[]>(
-        "/api/admin/students"
-    );
+  const response = await apiClient.get(
+    "/api/admin/students"
+  );
 
-    return data;
+  return response.data;
 };
 
-/*
- * Get student by ID
- */
 export const getStudent = async (
-    id: number
+  id: number
 ): Promise<Student> => {
-    const { data } = await apiClient.get<Student>(
-        `/api/admin/students/${id}`
-    );
+  const response = await apiClient.get(
+    `/api/admin/students/${id}`
+  );
 
-    return data;
+  return response.data;
 };
 
-/*
- * Get students by class section
- */
 export const getStudentsByClassSection = async (
-    classSectionId: number
+  classSectionId: number
 ): Promise<Student[]> => {
-    const { data } = await apiClient.get<Student[]>(
-        `/api/admin/students/class-section/${classSectionId}`
-    );
+  const response = await apiClient.get(
+    `/api/admin/students/class-section/${classSectionId}`
+  );
 
-    return data;
+  return response.data;
 };
 
-/*
- * Create student
- */
 export const createStudent = async (
-    request: StudentRequest
+  request: StudentRequest
 ): Promise<Student> => {
-    const { data } = await apiClient.post<Student>(
-        "/api/admin/students",
-        request
-    );
+  const response = await apiClient.post(
+    "/api/admin/students",
+    request
+  );
 
-    return data;
+  return response.data;
 };
 
-/*
- * Import students from Excel
- */
+export const downloadStudentTemplate = async () => {
+  const response = await apiClient.get(
+    "/api/admin/students/template",
+    {
+      responseType: "blob",
+    }
+  );
+
+  const url = window.URL.createObjectURL(
+    new Blob([response.data])
+  );
+
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "students-template.xlsx";
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  link.remove();
+
+  window.URL.revokeObjectURL(url);
+};
+
 export const importStudents = async (
-    file: File
-): Promise<ImportResponse> => {
-    const formData = new FormData();
+  file: File
+) => {
+  const formData = new FormData();
 
-    formData.append("file", file);
+  formData.append("file", file);
 
-    const { data } = await apiClient.post<ImportResponse>(
-        "/api/admin/students/import",
-        formData
-    );
+  const response = await apiClient.post(
+    "/api/admin/students/import",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
 
-    return data;
-};
-
-/*
- * Download Excel template
- */
-export const downloadStudentTemplate = async (): Promise<Blob> => {
-    const { data } = await apiClient.get(
-        "/api/admin/students/template",
-        {
-            responseType: "blob",
-        }
-    );
-
-    return data;
-};
-
-/*
- * Download template to user's computer
- */
-export const downloadStudentTemplateFile = async (): Promise<void> => {
-    const blob = await downloadStudentTemplate();
-
-    const url = window.URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "students-template.xlsx";
-
-    document.body.appendChild(link);
-
-    link.click();
-
-    link.remove();
-
-    window.URL.revokeObjectURL(url);
+  return response.data;
 };

@@ -45,8 +45,10 @@ public class ClassSection {
     private Department department;
 
     @OneToMany(mappedBy = "classSection")
+    @JsonIgnore
     private List<Student> students = new ArrayList<>();
 
     @OneToMany(mappedBy = "classSection")
+    @JsonIgnore
     private List<TeacherSubjectAssignment> teacherSubjectAssignments = new ArrayList<>();
 }

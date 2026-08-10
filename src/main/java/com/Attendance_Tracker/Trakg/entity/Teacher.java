@@ -1,6 +1,7 @@
 package com.Attendance_Tracker.Trakg.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -29,5 +30,6 @@ public class Teacher {
     @Column(nullable = false, length = 100)
     private String designation;
     @OneToMany(mappedBy = "teacher")
+    @JsonIgnore
     private List<TeacherSubjectAssignment> teacherSubjectAssignments = new ArrayList<>();
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getTeacherAssignmentsByTeacher } from '../../api/teacher-assignments';
+import { getAssignmentsByTeacher } from '../../api/teacher-assignments';
 import { DataTable } from '../../components/ui/DataTable';
 import { Button } from '../../components/ui/Button';
 
@@ -8,7 +8,7 @@ export function MyAssignments() {
   const { data: assignments, isLoading } = useQuery({
     queryKey: ['my-assignments'],
     // Mock user ID for now
-    queryFn: () => getTeacherAssignmentsByTeacher('teacher-1'),
+    queryFn: () => getAssignmentsByTeacher(1),
   });
 
   const columns = [

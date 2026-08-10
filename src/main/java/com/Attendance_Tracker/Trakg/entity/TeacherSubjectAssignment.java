@@ -1,5 +1,6 @@
 package com.Attendance_Tracker.Trakg.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,6 +30,11 @@ public class TeacherSubjectAssignment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id", nullable = false)
+    @JsonIgnoreProperties({
+            "teacherSubjectAssignments",
+            "hibernateLazyInitializer",
+            "handler"
+    })
     private Teacher teacher;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,10 +1,12 @@
 package com.Attendance_Tracker.Trakg.service;
 
 import com.Attendance_Tracker.Trakg.dto.SubjectRequest;
+import com.Attendance_Tracker.Trakg.entity.Department;
 import com.Attendance_Tracker.Trakg.entity.Semester;
 import com.Attendance_Tracker.Trakg.entity.Subject;
 import com.Attendance_Tracker.Trakg.exception.DuplicateResourceException;
 import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
+import com.Attendance_Tracker.Trakg.repository.DepartmentRepository;
 import com.Attendance_Tracker.Trakg.repository.SemesterRepository;
 import com.Attendance_Tracker.Trakg.repository.SubjectRepository;
 import jakarta.transaction.Transactional;
@@ -19,6 +21,7 @@ public class SubjectService {
 
     private final SubjectRepository subjectRepository;
     private final SemesterRepository semesterRepository;
+    private final DepartmentRepository departmentRepository;
 
     @Transactional
     public Subject createSubject(SubjectRequest request) {
@@ -26,9 +29,11 @@ public class SubjectService {
         Semester semester = semesterRepository.findById(request.getSemesterId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Semester not found."));
-        if (subjectRepository.existsBySubjectCodeAndSemesterId(
+        Department department = departmentRepository.findByDepartmentCode(request.getDepartmentCode());
+        if (subjectRepository.existsBySubjectCodeAndSemesterIdAndDepartmentDepartmentCode(
                 request.getSubjectCode(),
-                semester.getId())) {
+                semester.getId(),
+                department.getDepartmentCode())) {
             throw new DuplicateResourceException(
                     "Subject code already exists in this semester.");
         }
@@ -36,6 +41,7 @@ public class SubjectService {
                 .subjectCode(request.getSubjectCode())
                 .subjectName(request.getSubjectName())
                 .semester(semester)
+                .department(department)
                 .build();
         return subjectRepository.save(subject);
     }

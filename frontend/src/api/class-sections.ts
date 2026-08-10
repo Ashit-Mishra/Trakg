@@ -1,132 +1,141 @@
 import { apiClient } from "./client";
-import { ClassSection } from "../types";
+
+export interface ClassSection {
+  id: number;
+  sectionName: string;
+
+  semester?: {
+    id: number;
+    semesterNumber: number;
+  };
+
+  department?: {
+    id: number;
+    departmentCode: string;
+    departmentName: string;
+  };
+}
 
 export interface ClassSectionRequest {
-    sectionName: string;
-    semesterId: number;
+  sectionName: string;
+  semesterId: number;
 }
 
 export interface ImportResponse {
-    success?: boolean;
-    message?: string;
-    totalRows?: number;
-    importedRows?: number;
-    failedRows?: number;
-    errors?: {
-        row: number;
-        message: string;
-    }[];
+  success?: boolean;
+  message?: string;
+  totalRows?: number;
+  importedRows?: number;
+  failedRows?: number;
+  errors?: {
+    row: number;
+    message: string;
+  }[];
 }
 
-/*
- * Get all class sections
- */
-export const getClassSections = async (): Promise<
-    ClassSection[]
-> => {
-    const { data } = await apiClient.get<ClassSection[]>(
-        "/api/admin/class-sections"
+export const getClassSections =
+  async (): Promise<ClassSection[]> => {
+    const response = await apiClient.get(
+      "/api/admin/class-sections"
     );
 
-    return data;
-};
+    console.log(
+      "CLASS SECTIONS RESPONSE:",
+      response.data
+    );
 
-/*
- * Get class section by ID
- */
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+
+    return [];
+  };
+
 export const getClassSection = async (
-    id: number
+  id: number
 ): Promise<ClassSection> => {
-    const { data } = await apiClient.get<ClassSection>(
-        `/api/admin/class-sections/${id}`
+  const { data } =
+    await apiClient.get<ClassSection>(
+      `/api/admin/class-sections/${id}`
     );
 
-    return data;
+  return data;
 };
 
-/*
- * Get class sections by semester
- */
-export const getClassSectionsBySemester = async (
+export const getClassSectionsBySemester =
+  async (
     semesterId: number
-): Promise<ClassSection[]> => {
-    const { data } = await apiClient.get<ClassSection[]>(
-        `/api/admin/class-sections/semester/${semesterId}`
+  ): Promise<ClassSection[]> => {
+    const response = await apiClient.get(
+      `/api/admin/class-sections/semester/${semesterId}`
     );
 
-    return data;
-};
+    return Array.isArray(response.data)
+      ? response.data
+      : [];
+  };
 
-/*
- * Create class section
- */
 export const createClassSection = async (
-    request: ClassSectionRequest
+  request: ClassSectionRequest
 ): Promise<ClassSection> => {
-    const { data } = await apiClient.post<ClassSection>(
-        "/api/admin/class-sections",
-        request
+  const { data } =
+    await apiClient.post<ClassSection>(
+      "/api/admin/class-sections",
+      request
     );
 
-    return data;
+  return data;
 };
 
-/*
- * Import class sections
- */
 export const importClassSections = async (
-    file: File
+  file: File
 ): Promise<ImportResponse> => {
-    const formData = new FormData();
+  const formData = new FormData();
 
-    formData.append("file", file);
+  formData.append("file", file);
 
-    const { data } = await apiClient.post<ImportResponse>(
-        "/api/admin/class-sections/import",
-        formData
+  const { data } =
+    await apiClient.post<ImportResponse>(
+      "/api/admin/class-sections/import",
+      formData
+    );
+
+  return data;
+};
+
+export const downloadClassSectionTemplate =
+  async (): Promise<Blob> => {
+    const { data } = await apiClient.get(
+      "/api/admin/class-sections/template",
+      {
+        responseType: "blob",
+      }
     );
 
     return data;
-};
+  };
 
-/*
- * Download Excel template
- */
-export const downloadClassSectionTemplate =
-    async (): Promise<Blob> => {
-        const { data } = await apiClient.get(
-            "/api/admin/class-sections/template",
-            {
-                responseType: "blob",
-            }
-        );
-
-        return data;
-    };
-
-/*
- * Download template file
- */
 export const downloadClassSectionTemplateFile =
-    async (): Promise<void> => {
-        const blob =
-            await downloadClassSectionTemplate();
+  async (): Promise<void> => {
+    const blob =
+      await downloadClassSectionTemplate();
 
-        const url =
-            window.URL.createObjectURL(blob);
+    const url =
+      window.URL.createObjectURL(blob);
 
-        const link =
-            document.createElement("a");
+    const link =
+      document.createElement("a");
 
-        link.href = url;
-        link.download =
-            "class-sections-template.xlsx";
+    link.href = url;
 
-        document.body.appendChild(link);
+    link.download =
+      "class-sections-template.xlsx";
 
-        link.click();
+    document.body.appendChild(link);
 
-        link.remove();
+    link.click();
 
-        window.URL.revokeObjectURL(url);
-    };
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+  };

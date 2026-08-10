@@ -76,11 +76,11 @@ public class TeacherSubjectAssignmentImportService {
 
         try {
             Long teacherId = ExcelReader.getLong(row, 0);
-            Long subjectId = ExcelReader.getLong(row, 1);
-            Long classSectionId = ExcelReader.getLong(row, 2);
+            String subjectCode = ExcelReader.getString(row, 1);
+            String classSectionName = ExcelReader.getString(row, 2);
             if (teacherId == null
-                    || subjectId == null
-                    || classSectionId == null) {
+                    || subjectCode.isBlank()
+                    || classSectionName.isBlank()) {
                 errors.add(
                         ImportError.builder()
                                 .row(row.getRowNum() + 1)
@@ -102,8 +102,7 @@ public class TeacherSubjectAssignmentImportService {
                 return false;
             }
             Subject subject = subjectRepository
-                    .findById(subjectId)
-                    .orElse(null);
+                    .findBySubjectCode(subjectCode);
             if (subject == null) {
                 errors.add(
                         ImportError.builder()
@@ -114,8 +113,7 @@ public class TeacherSubjectAssignmentImportService {
                 return false;
             }
             ClassSection classSection = classSectionRepository
-                    .findById(classSectionId)
-                    .orElse(null);
+                    .findBySectionName(classSectionName);
             if (classSection == null) {
                 errors.add(
                         ImportError.builder()

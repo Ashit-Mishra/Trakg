@@ -9,11 +9,36 @@ public class ExcelReader {
     }
 
     public static String getString(Row row, int cellIndex) {
+
         Cell cell = row.getCell(cellIndex);
+
         if (cell == null) {
             return "";
         }
-        return cell.getStringCellValue().trim();
+
+        switch (cell.getCellType()) {
+
+            case STRING:
+                return cell.getStringCellValue().trim();
+
+            case NUMERIC:
+                double value = cell.getNumericCellValue();
+
+                if (value == Math.floor(value)) {
+                    return String.valueOf((long) value);
+                }
+
+                return String.valueOf(value);
+
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+
+            case FORMULA:
+                return cell.getCellFormula();
+
+            default:
+                return "";
+        }
     }
 
     public static Long getLong(Row row, int cellIndex) {

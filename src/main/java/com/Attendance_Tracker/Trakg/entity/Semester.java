@@ -30,6 +30,7 @@ public class Semester {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
     @OneToMany(mappedBy = "semester")
+    @JsonIgnore
     private List<Subject> subjects = new ArrayList<>();
     @OneToMany(mappedBy = "semester")
     @JsonIgnore

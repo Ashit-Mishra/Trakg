@@ -1,521 +1,694 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
-    useMutation,
-    useQuery,
-    useQueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from "@tanstack/react-query";
 import {
-    Plus,
-    Upload,
-    Download,
-    AlertCircle,
+  Plus,
+  Download,
+  Upload,
+  X,
+  AlertCircle,
 } from "lucide-react";
 
 import {
-    getStudents,
-    createStudent,
-    importStudents,
-    downloadStudentTemplateFile,
-    StudentRequest,
+  getStudents,
+  createStudent,
+  downloadStudentTemplate,
+  importStudents,
+  Student,
 } from "../../api/students";
 
-import { Student } from "../../types";
+import { getClassSections } from "../../api/class-sections";
 
 import { Button } from "../../components/ui/Button";
-import { DataTable } from "../../components/ui/DataTable";
-import { SearchBar } from "../../components/ui/SearchBar";
-import { Badge } from "../../components/ui/Badge";
 import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
 } from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
+
+import { DataTable } from "../../components/ui/DataTable";
 
 export function Students() {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    const fileInputRef = useRef<HTMLInputElement>(null);
+  // =========================
+  // FORM STATE
+  // =========================
 
-    const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
-    const [userId, setUserId] = useState("");
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [rollNumber, setRollNumber] = useState("");
-    const [classSectionId, setClassSectionId] = useState("");
+  const [userId, setUserId] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [rollNumber, setRollNumber] = useState("");
+  const [classSectionId, setClassSectionId] = useState("");
 
-    const [createError, setCreateError] = useState("");
-    const [importError, setImportError] = useState("");
+  const [search, setSearch] = useState("");
+  const [error, setError] = useState("");
 
-    /*
-     * =========================
-     * GET STUDENTS
-     * =========================
-     */
+  // =========================
+  // GET STUDENTS
+  // =========================
 
-    const {
-        data: students = [],
-        isLoading,
-        isError,
-    } = useQuery({
+  const {
+    data: students = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["students"],
+    queryFn: getStudents,
+  });
+
+  // =========================
+  // GET CLASS SECTIONS
+  // =========================
+
+  const {
+    data: classSections = [],
+    isLoading: classSectionsLoading,
+  } = useQuery({
+    queryKey: ["class-sections"],
+    queryFn: getClassSections,
+  });
+
+  // =========================
+  // CREATE STUDENT
+  // =========================
+
+  const createMutation = useMutation({
+    mutationFn: createStudent,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
         queryKey: ["students"],
-        queryFn: getStudents,
+      });
+
+      // Clear form
+      setUserId("");
+      setName("");
+      setEmail("");
+      setRollNumber("");
+      setClassSectionId("");
+
+      setError("");
+      setShowForm(false);
+    },
+
+    onError: (err: any) => {
+      console.error("Create student error:", err);
+
+      setError(
+        err.response?.data?.message ||
+          "Failed to create student."
+      );
+    },
+  });
+
+  // =========================
+  // CREATE STUDENT
+  // =========================
+
+  const handleCreate = (
+    event: React.FormEvent
+  ) => {
+    event.preventDefault();
+
+    setError("");
+
+    if (!userId.trim()) {
+      setError("User ID is required.");
+      return;
+    }
+
+    if (userId.trim().length < 4) {
+      setError(
+        "User ID must be at least 4 characters."
+      );
+      return;
+    }
+
+    if (!name.trim()) {
+      setError("Name is required.");
+      return;
+    }
+
+    if (!email.trim()) {
+      setError("Email is required.");
+      return;
+    }
+
+    if (!rollNumber.trim()) {
+      setError("Roll number is required.");
+      return;
+    }
+
+    if (!classSectionId) {
+      setError(
+        "Please select a class section."
+      );
+      return;
+    }
+
+    createMutation.mutate({
+      userId: userId.trim(),
+      name: name.trim(),
+      email: email.trim(),
+      rollNumber: rollNumber.trim(),
+      classSectionId: Number(classSectionId),
     });
+  };
 
-    /*
-     * =========================
-     * CREATE STUDENT
-     * =========================
-     */
+  // =========================
+  // IMPORT EXCEL
+  // =========================
 
-    const createMutation = useMutation({
-        mutationFn: (request: StudentRequest) =>
-            createStudent(request),
+  const handleImport = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
 
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["students"],
-            });
+    if (!file) {
+      return;
+    }
 
-            setUserId("");
-            setName("");
-            setEmail("");
-            setRollNumber("");
-            setClassSectionId("");
+    setError("");
 
-            setCreateError("");
-            setShowForm(false);
-        },
+    try {
+      const result = await importStudents(file);
 
-        onError: (error: any) => {
-            setCreateError(
-                error.response?.data?.message ||
-                    "Failed to create student."
-            );
-        },
-    });
+      console.log(
+        "Student import result:",
+        result
+      );
 
-    /*
-     * =========================
-     * IMPORT STUDENTS
-     * =========================
-     */
+      queryClient.invalidateQueries({
+        queryKey: ["students"],
+      });
 
-    const importMutation = useMutation({
-        mutationFn: (file: File) =>
-            importStudents(file),
+      if (
+        result?.failedRows &&
+        result.failedRows > 0
+      ) {
+        setError(
+          `${result.failedRows} student(s) failed to import.`
+        );
+      }
+    } catch (err: any) {
+      console.error(
+        "Student import error:",
+        err
+      );
 
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["students"],
-            });
+      setError(
+        err.response?.data?.message ||
+          "Failed to import students."
+      );
+    }
 
-            setImportError("");
-        },
+    // Allow the same file to be selected again
+    event.target.value = "";
+  };
 
-        onError: (error: any) => {
-            setImportError(
-                error.response?.data?.message ||
-                    "Failed to import students."
-            );
-        },
-    });
+  // =========================
+  // SEARCH
+  // =========================
 
-    /*
-     * =========================
-     * CREATE HANDLER
-     * =========================
-     */
+  const filteredStudents = Array.isArray(
+    students
+  )
+    ? students.filter(
+        (student: Student) => {
+          const query =
+            search.toLowerCase();
 
-    const handleCreateStudent = (
-        event: React.FormEvent
-    ) => {
-        event.preventDefault();
+          return (
+            student.rollNumber
+              ?.toLowerCase()
+              .includes(query) ||
 
-        setCreateError("");
+            student.user?.name
+              ?.toLowerCase()
+              .includes(query) ||
 
-        if (!userId.trim()) {
-            setCreateError("User ID is required.");
-            return;
+            student.user?.email
+              ?.toLowerCase()
+              .includes(query) ||
+
+            student.classSection?.sectionName
+              ?.toLowerCase()
+              .includes(query) ||
+
+            student.classSection?.department
+              ?.departmentCode
+              ?.toLowerCase()
+              .includes(query)
+          );
         }
+      )
+    : [];
 
-        if (userId.trim().length < 4) {
-            setCreateError(
-                "User ID must be at least 4 characters."
-            );
-            return;
-        }
+  // =========================
+  // TABLE COLUMNS
+  // =========================
 
-        if (userId.trim().length > 30) {
-            setCreateError(
-                "User ID cannot exceed 30 characters."
-            );
-            return;
-        }
+  const columns = [
+    {
+      key: "rollNumber",
+      header: "Roll No.",
 
-        if (!name.trim()) {
-            setCreateError("Name is required.");
-            return;
-        }
+      render: (student: Student) => (
+        <span className="font-medium">
+          {student.rollNumber}
+        </span>
+      ),
+    },
 
-        if (name.trim().length < 3) {
-            setCreateError(
-                "Name must be at least 3 characters."
-            );
-            return;
-        }
+    {
+      key: "name",
+      header: "Name",
 
-        if (name.trim().length > 100) {
-            setCreateError(
-                "Name cannot exceed 100 characters."
-            );
-            return;
-        }
+      render: (student: Student) => (
+        <span>
+          {student.user?.name || "N/A"}
+        </span>
+      ),
+    },
 
-        if (!email.trim()) {
-            setCreateError("Email is required.");
-            return;
-        }
+    {
+      key: "email",
+      header: "Email",
 
-        if (!rollNumber.trim()) {
-            setCreateError("Roll number is required.");
-            return;
-        }
+      render: (student: Student) => (
+        <span>
+          {student.user?.email || "N/A"}
+        </span>
+      ),
+    },
 
-        if (!classSectionId) {
-            setCreateError(
-                "Class section ID is required."
-            );
-            return;
-        }
+    {
+      key: "department",
+      header: "Department",
 
-        createMutation.mutate({
-            userId: userId.trim(),
-            name: name.trim(),
-            email: email.trim(),
-            rollNumber: rollNumber.trim(),
-            classSectionId: Number(classSectionId),
-        });
-    };
+      render: (student: Student) => (
+        <span>
+          {student.classSection?.department
+            ?.departmentCode || "N/A"}
+        </span>
+      ),
+    },
 
-    /*
-     * =========================
-     * EXCEL IMPORT
-     * =========================
-     */
+    {
+      key: "classSection",
+      header: "Class Section",
 
-    const handleFileChange = (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        const file = event.target.files?.[0];
+      render: (student: Student) => (
+        <span>
+          {student.classSection
+            ?.sectionName || "N/A"}
+        </span>
+      ),
+    },
 
-        if (!file) {
-            return;
-        }
+    {
+      key: "semester",
+      header: "Semester",
 
-        setImportError("");
+      render: (student: Student) => (
+        <span>
+          {student.classSection?.semester
+            ?.semesterNumber
+            ? `Semester ${student.classSection.semester.semesterNumber}`
+            : "N/A"}
+        </span>
+      ),
+    },
 
-        importMutation.mutate(file);
+    {
+      key: "status",
+      header: "Status",
 
-        event.target.value = "";
-    };
+      render: (student: Student) => (
+        <span
+          className={
+            student.user?.isActive
+              ? "rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"
+              : "rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700"
+          }
+        >
+          {student.user?.isActive
+            ? "Active"
+            : "Inactive"}
+        </span>
+      ),
+    },
+  ];
 
-    /*
-     * =========================
-     * TABLE COLUMNS
-     * =========================
-     */
+  // =========================
+  // UI
+  // =========================
 
-    const columns = [
-        {
-            key: "rollNumber",
-            header: "Roll No.",
-        },
+  return (
+    <div className="space-y-6">
 
-        {
-            key: "name",
-            header: "Name",
-            render: (student: Student) =>
-                student.user?.name || "N/A",
-        },
+      {/* =========================
+          HEADER
+      ========================= */}
 
-        {
-            key: "email",
-            header: "Email",
-            render: (student: Student) =>
-                student.user?.email || "N/A",
-        },
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
-        {
-            key: "classSection",
-            header: "Class Section",
-            render: (student: Student) =>
-                student.classSection?.sectionName || "N/A",
-        },
+        <div>
+          <h1 className="text-3xl font-bold text-text">
+            Students
+          </h1>
 
-        {
-            key: "status",
-            header: "Status",
+          <p className="mt-1 text-gray-500">
+            Manage student records.
+          </p>
+        </div>
 
-            render: (student: Student) => (
-                <Badge
-                    variant={
-                        student.user?.isActive
-                            ? "success"
-                            : "danger"
-                    }
-                >
-                    {student.user?.isActive
-                        ? "Active"
-                        : "Inactive"}
-                </Badge>
-            ),
-        },
-    ];
+        <div className="flex flex-wrap gap-3">
 
-    return (
-        <div className="space-y-6">
+          {/* DOWNLOAD TEMPLATE */}
 
-            {/* =========================
-                HEADER
-            ========================= */}
+          <Button
+            type="button"
+            onClick={
+              downloadStudentTemplate
+            }
+          >
+            <Download
+              size={18}
+              className="mr-2"
+            />
 
-            <div className="flex items-center justify-between">
+            Template
+          </Button>
 
-                <div>
-                    <h1 className="text-2xl font-semibold text-text">
-                        Students
-                    </h1>
+          {/* IMPORT */}
 
-                    <p className="text-sm text-gray-500 mt-1">
-                        Manage student records.
-                    </p>
-                </div>
+          <label className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90">
 
-                <div className="flex items-center gap-3">
+            <Upload
+              size={18}
+              className="mr-2"
+            />
 
-                    {/* DOWNLOAD TEMPLATE */}
+            Import
 
-                    <Button
-                        type="button"
-                        onClick={
-                            downloadStudentTemplateFile
-                        }
-                    >
-                        <Download
-                            size={18}
-                            className="mr-2"
-                        />
+            <input
+              type="file"
+              accept=".xlsx"
+              className="hidden"
+              onChange={handleImport}
+            />
 
-                        Template
-                    </Button>
+          </label>
 
-                    {/* IMPORT */}
+          {/* ADD STUDENT */}
 
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".xlsx,.xls"
-                        className="hidden"
-                        onChange={handleFileChange}
-                    />
+          <Button
+            type="button"
+            onClick={() => {
+              setShowForm(!showForm);
+              setError("");
+            }}
+          >
+            {showForm ? (
+              <>
+                <X
+                  size={18}
+                  className="mr-2"
+                />
 
-                    <Button
-                        type="button"
-                        onClick={() =>
-                            fileInputRef.current?.click()
-                        }
-                        isLoading={
-                            importMutation.isPending
-                        }
-                    >
-                        <Upload
-                            size={18}
-                            className="mr-2"
-                        />
+                Cancel
+              </>
+            ) : (
+              <>
+                <Plus
+                  size={18}
+                  className="mr-2"
+                />
 
-                        Import
-                    </Button>
-
-                    {/* ADD STUDENT */}
-
-                    <Button
-                        type="button"
-                        onClick={() =>
-                            setShowForm(!showForm)
-                        }
-                    >
-                        <Plus
-                            size={18}
-                            className="mr-2"
-                        />
-
-                        Add Student
-                    </Button>
-
-                </div>
-            </div>
-
-            {/* =========================
-                IMPORT ERROR
-            ========================= */}
-
-            {importError && (
-                <div className="flex items-center gap-2 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
-                    <AlertCircle size={18} />
-
-                    {importError}
-                </div>
+                Add Student
+              </>
             )}
-
-            {/* =========================
-                CREATE FORM
-            ========================= */}
-
-            {showForm && (
-                <Card>
-
-                    <CardHeader>
-                        <CardTitle>
-                            Add Student
-                        </CardTitle>
-                    </CardHeader>
-
-                    <CardContent>
-
-                        <form
-                            onSubmit={
-                                handleCreateStudent
-                            }
-                            className="grid grid-cols-1 md:grid-cols-2 gap-5"
-                        >
-
-                            <Input
-                                label="User ID"
-                                type="text"
-                                value={userId}
-                                onChange={(event) =>
-                                    setUserId(
-                                        event.target.value
-                                    )
-                                }
-                                placeholder="Enter user ID"
-                            />
-
-                            <Input
-                                label="Name"
-                                type="text"
-                                value={name}
-                                onChange={(event) =>
-                                    setName(
-                                        event.target.value
-                                    )
-                                }
-                                placeholder="Enter student name"
-                            />
-
-                            <Input
-                                label="Email"
-                                type="email"
-                                value={email}
-                                onChange={(event) =>
-                                    setEmail(
-                                        event.target.value
-                                    )
-                                }
-                                placeholder="Enter email"
-                            />
-
-                            <Input
-                                label="Roll Number"
-                                type="text"
-                                value={rollNumber}
-                                onChange={(event) =>
-                                    setRollNumber(
-                                        event.target.value
-                                    )
-                                }
-                                placeholder="Enter roll number"
-                            />
-
-                            <Input
-                                label="Class Section ID"
-                                type="number"
-                                value={classSectionId}
-                                onChange={(event) =>
-                                    setClassSectionId(
-                                        event.target.value
-                                    )
-                                }
-                                placeholder="Enter class section ID"
-                            />
-
-                            {createError && (
-                                <div className="md:col-span-2 flex items-center gap-2 text-sm text-red-600">
-                                    <AlertCircle
-                                        size={18}
-                                    />
-
-                                    {createError}
-                                </div>
-                            )}
-
-                            <div className="md:col-span-2 flex gap-3">
-
-                                <Button
-                                    type="submit"
-                                    isLoading={
-                                        createMutation.isPending
-                                    }
-                                >
-                                    Create Student
-                                </Button>
-
-                                <Button
-                                    type="button"
-                                    onClick={() => {
-                                        setShowForm(false);
-                                        setCreateError("");
-                                    }}
-                                >
-                                    Cancel
-                                </Button>
-
-                            </div>
-
-                        </form>
-
-                    </CardContent>
-
-                </Card>
-            )}
-
-            {/* =========================
-                STUDENT TABLE
-            ========================= */}
-
-            <div className="bg-white rounded-3xl p-6 shadow-soft border border-gray-100">
-
-                <div className="max-w-md mb-6">
-                    <SearchBar />
-                </div>
-
-                {isError ? (
-                    <div className="py-12 text-center text-red-600">
-                        Failed to load students.
-                    </div>
-                ) : (
-                    <DataTable
-                        columns={columns}
-                        data={students}
-                        isLoading={isLoading}
-                    />
-                )}
-
-            </div>
+          </Button>
 
         </div>
-    );
+      </div>
+
+      {/* =========================
+          ERROR
+      ========================= */}
+
+      {error && (
+        <div className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
+
+          <AlertCircle size={18} />
+
+          {error}
+
+        </div>
+      )}
+
+      {/* =========================
+          CREATE FORM
+      ========================= */}
+
+      {showForm && (
+        <Card>
+
+          <CardHeader>
+            <CardTitle>
+              Create Student
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent>
+
+            <form
+              onSubmit={handleCreate}
+              className="space-y-5"
+            >
+
+              {/* USER ID */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  User ID
+                </label>
+
+                <input
+                  type="text"
+                  value={userId}
+                  onChange={(event) =>
+                    setUserId(
+                      event.target.value
+                    )
+                  }
+                  placeholder="e.g. STU001"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+
+                <p className="mt-1 text-xs text-gray-500">
+                  Must be between 4 and
+                  30 characters.
+                </p>
+              </div>
+
+              {/* NAME */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Name
+                </label>
+
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(event) =>
+                    setName(
+                      event.target.value
+                    )
+                  }
+                  placeholder="e.g. Rahul Kumar"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              {/* EMAIL */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(event) =>
+                    setEmail(
+                      event.target.value
+                    )
+                  }
+                  placeholder="e.g. rahul@example.com"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              {/* ROLL NUMBER */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Roll Number
+                </label>
+
+                <input
+                  type="text"
+                  value={rollNumber}
+                  onChange={(event) =>
+                    setRollNumber(
+                      event.target.value
+                    )
+                  }
+                  placeholder="e.g. 23IT001"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm uppercase outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              {/* CLASS SECTION DROPDOWN */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Class Section
+                </label>
+
+                <select
+                  value={classSectionId}
+                  onChange={(event) =>
+                    setClassSectionId(
+                      event.target.value
+                    )
+                  }
+                  disabled={
+                    classSectionsLoading
+                  }
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:bg-gray-100"
+                >
+                  <option value="">
+                    {classSectionsLoading
+                      ? "Loading class sections..."
+                      : "Select class section"}
+                  </option>
+
+                  {classSections.map(
+                    (section) => (
+                      <option
+                        key={section.id}
+                        value={section.id}
+                      >
+                        {section.department
+                          ?.departmentCode
+                          ? `${section.department.departmentCode} - `
+                          : ""}
+
+                        {section.sectionName}
+
+                        {section.semester
+                          ?.semesterNumber
+                          ? ` (Semester ${section.semester.semesterNumber})`
+                          : ""}
+                      </option>
+                    )
+                  )}
+                </select>
+              </div>
+
+              {/* FORM BUTTONS */}
+
+              <div className="flex gap-3">
+
+                <Button
+                  type="submit"
+                  isLoading={
+                    createMutation.isPending
+                  }
+                >
+                  Create Student
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setShowForm(false);
+
+                    setUserId("");
+                    setName("");
+                    setEmail("");
+                    setRollNumber("");
+                    setClassSectionId("");
+
+                    setError("");
+                  }}
+                >
+                  Cancel
+                </Button>
+
+              </div>
+
+            </form>
+
+          </CardContent>
+
+        </Card>
+      )}
+
+      {/* =========================
+          STUDENTS TABLE
+      ========================= */}
+
+      <Card>
+
+        <CardContent className="p-6">
+
+          {/* SEARCH */}
+
+          <div className="mb-6 max-w-md">
+            <input
+              type="text"
+              value={search}
+              onChange={(event) =>
+                setSearch(
+                  event.target.value
+                )
+              }
+              placeholder="Search students..."
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+
+          {/* TABLE */}
+
+          {isError ? (
+            <div className="py-12 text-center text-red-600">
+              Failed to load students.
+            </div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={filteredStudents}
+              isLoading={isLoading}
+            />
+          )}
+
+        </CardContent>
+
+      </Card>
+
+    </div>
+  );
 }

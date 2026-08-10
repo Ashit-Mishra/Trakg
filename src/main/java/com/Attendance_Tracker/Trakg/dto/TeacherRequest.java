@@ -25,4 +25,6 @@ public class TeacherRequest {
     private Long departmentId;
     @NotBlank
     private String designation;
+    @NotBlank
+    private String department;
 }

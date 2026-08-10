@@ -82,13 +82,13 @@ public class TeacherImportService {
             String userId = ExcelReader.getString(row, 0);
             String name = ExcelReader.getString(row, 1);
             String email = ExcelReader.getString(row, 2);
-            Long departmentId = ExcelReader.getLong(row, 3);
+            String departmentCode = ExcelReader.getString(row, 3);
             String designation = ExcelReader.getString(row, 4);
             if (userId.isBlank()
                     || name.isBlank()
                     || email.isBlank()
                     || designation.isBlank()
-                    || departmentId == null) {
+                    || departmentCode.isBlank()) {
                 errors.add(
                         ImportError.builder()
                                 .row(row.getRowNum() + 1)
@@ -118,8 +118,7 @@ public class TeacherImportService {
                 return false;
             }
             Department department =
-                    departmentRepository.findById(departmentId)
-                            .orElse(null);
+                    departmentRepository.findByDepartmentCode(departmentCode);
             if (department == null) {
 
                 errors.add(

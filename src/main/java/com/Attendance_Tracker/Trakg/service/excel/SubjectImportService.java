@@ -2,10 +2,12 @@ package com.Attendance_Tracker.Trakg.service.excel;
 
 import com.Attendance_Tracker.Trakg.dto.excel.ImportError;
 import com.Attendance_Tracker.Trakg.dto.excel.ImportResponse;
+import com.Attendance_Tracker.Trakg.entity.Department;
 import com.Attendance_Tracker.Trakg.entity.Semester;
 import com.Attendance_Tracker.Trakg.entity.Subject;
 import com.Attendance_Tracker.Trakg.exception.BadRequestException;
 import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
+import com.Attendance_Tracker.Trakg.repository.DepartmentRepository;
 import com.Attendance_Tracker.Trakg.repository.SemesterRepository;
 import com.Attendance_Tracker.Trakg.repository.SubjectRepository;
 import com.Attendance_Tracker.Trakg.util.ExcelReader;
@@ -27,6 +29,7 @@ public class SubjectImportService {
 
     private final SubjectRepository subjectRepository;
     private final SemesterRepository semesterRepository;
+    private final DepartmentRepository departmentRepository;
 
     public ImportResponse importSubjects(MultipartFile file) {
         if (file.isEmpty()) {
@@ -70,10 +73,11 @@ public class SubjectImportService {
             try {
                 String subjectCode = ExcelReader.getString(row, 0);
                 String subjectName = ExcelReader.getString(row, 1);
-                Long semesterId = ExcelReader.getLong(row, 2);
+                Integer semesterNumber = ExcelReader.getInteger(row, 2);
+                String departmentCode = ExcelReader.getString(row, 3);
                 if (subjectCode.isBlank()
                         || subjectName.isBlank()
-                        || semesterId == null) {
+                        || semesterNumber == null || departmentCode.isBlank()) {
 
                     errors.add(
                             ImportError.builder()
@@ -94,13 +98,22 @@ public class SubjectImportService {
                     return false;
                 }
                 Semester semester = semesterRepository
-                        .findById(semesterId)
-                        .orElse(null);
+                        .findBySemesterNumber(semesterNumber);
                 if (semester == null) {
                     errors.add(
                             ImportError.builder()
                                     .row(row.getRowNum() + 1)
-                                    .message("Invalid Semester ID.")
+                                    .message("Invalid Semester.")
+                                    .build()
+                    );
+                    return false;
+                }
+                Department department = departmentRepository.findByDepartmentCode(departmentCode);
+                if (department == null){
+                    errors.add(
+                            ImportError.builder()
+                                    .row(row.getRowNum() + 1)
+                                    .message("Invalid Department Code.")
                                     .build()
                     );
                     return false;
@@ -109,6 +122,7 @@ public class SubjectImportService {
                         .subjectCode(subjectCode)
                         .subjectName(subjectName)
                         .semester(semester)
+                        .department(department)
                         .build();
                 subjectRepository.save(subject);
                 return true;

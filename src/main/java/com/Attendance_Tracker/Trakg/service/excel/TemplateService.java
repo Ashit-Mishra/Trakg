@@ -21,7 +21,7 @@ public class TemplateService {
         header.createCell(1).setCellValue("Name");
         header.createCell(2).setCellValue("Email");
         header.createCell(3).setCellValue("Roll Number");
-        header.createCell(4).setCellValue("Class Section ID");
+        header.createCell(4).setCellValue("Class Section");
         for (int i = 0; i < 5; i++) {
             sheet.autoSizeColumn(i);
         }
@@ -39,7 +39,7 @@ public class TemplateService {
         header.createCell(0).setCellValue("User ID");
         header.createCell(1).setCellValue("Name");
         header.createCell(2).setCellValue("Email");
-        header.createCell(3).setCellValue("Department ID");
+        header.createCell(3).setCellValue("Department");
         header.createCell(4).setCellValue("Designation");
         for (int i = 0; i < 5; i++) {
             sheet.autoSizeColumn(i);
@@ -72,10 +72,11 @@ public class TemplateService {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Subjects");
         Row header = sheet.createRow(0);
-        header.createCell(0).setCellValue("Subject Name");
-        header.createCell(1).setCellValue("Subject Code");
+        header.createCell(0).setCellValue("Subject Code");
+        header.createCell(1).setCellValue("Subject Name");
         header.createCell(2).setCellValue("Semester");
-        for (int i = 0; i < 3; i++) {
+        header.createCell(3).setCellValue("Department");
+        for (int i = 0; i < 4; i++) {
             sheet.autoSizeColumn(i);
         }
         ByteArrayOutputStream outputStream =
@@ -106,9 +107,9 @@ public class TemplateService {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Assignments");
         Row header = sheet.createRow(0);
-        header.createCell(0).setCellValue("Teacher ID");
-        header.createCell(1).setCellValue("Subject ID");
-        header.createCell(2).setCellValue("Class Section ID");
+        header.createCell(0).setCellValue("Teacher Id");
+        header.createCell(1).setCellValue("Subject Code");
+        header.createCell(2).setCellValue("Class Section");
         for (int i = 0; i < 3; i++) {
             sheet.autoSizeColumn(i);
         }

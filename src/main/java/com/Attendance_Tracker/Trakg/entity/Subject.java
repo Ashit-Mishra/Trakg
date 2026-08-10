@@ -25,4 +25,7 @@ public class Subject {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "semester_id", nullable = false)
     private Semester semester;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department", nullable = false)
+    private Department department;
 }

@@ -16,7 +16,7 @@ import { Subjects } from "../pages/admin/Subjects";
 import { Semesters } from "../pages/admin/Semesters";
 import { ClassSections } from "../pages/admin/ClassSections";
 import { AcademicSessions } from "../pages/admin/AcademicSessions";
-import { TeacherAssignments } from "../pages/admin/TeacherAssignments";
+import { Assignments } from "../pages/admin/TeacherAssignments";
 import { Users } from "../pages/admin/Users";
 
 // Teacher
@@ -155,7 +155,7 @@ export function AppRoutes() {
                 element={
                     <RoleGuard allowedRoles={["ADMIN"]}>
                         <AppShell>
-                            <TeacherAssignments />
+                            <Assignments />
                         </AppShell>
                     </RoleGuard>
                 }

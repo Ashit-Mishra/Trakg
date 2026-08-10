@@ -14,4 +14,6 @@ public interface SemesterRepository extends JpaRepository<Semester, Long> {
             Long departmentId
     );
     List<Semester> findByDepartmentId(Long departmentId);
+
+    Semester findBySemesterNumber(Integer semesterNumber);
 }

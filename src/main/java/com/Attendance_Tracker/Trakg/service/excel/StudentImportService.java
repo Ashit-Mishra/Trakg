@@ -94,13 +94,13 @@ public class StudentImportService {
                 String name = ExcelReader.getString(row, 1);
                 String email = ExcelReader.getString(row, 2);
                 String rollNumber = ExcelReader.getString(row, 3);
-                Long classSectionId = ExcelReader.getLong(row, 4);
+                String classSectionName = ExcelReader.getString(row, 4);
                 // Required field validation
                 if (userId.isBlank()
                         || name.isBlank()
                         || email.isBlank()
                         || rollNumber.isBlank()
-                        || classSectionId == null) {
+                        || classSectionName.isBlank()) {
                     errors.add(
                             ImportError.builder()
                                     .row(row.getRowNum() + 1)
@@ -141,13 +141,12 @@ public class StudentImportService {
                 }
                 // Class Section
                 ClassSection classSection = classSectionRepository
-                        .findById(classSectionId)
-                        .orElse(null);
+                        .findBySectionName(classSectionName);
                 if (classSection == null) {
                     errors.add(
                             ImportError.builder()
                                     .row(row.getRowNum() + 1)
-                                    .message("Invalid Class Section ID.")
+                                    .message("Invalid Class Section")
                                     .build()
                     );
                     return false;
