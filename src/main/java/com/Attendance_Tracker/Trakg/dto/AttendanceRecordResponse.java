@@ -17,4 +17,7 @@ public class AttendanceRecordResponse {
     private String rollNumber;
     private AttendanceStatus status;
     private LocalDate attendanceDate;
+    private String subjectCode;
+    private String subjectName;
+    private String teacherName;
 }

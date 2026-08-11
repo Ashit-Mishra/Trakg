@@ -1,5 +1,6 @@
 package com.Attendance_Tracker.Trakg.controller;
 
+import com.Attendance_Tracker.Trakg.dto.AttendanceRecordResponse;
 import com.Attendance_Tracker.Trakg.dto.AttendanceRequest;
 import com.Attendance_Tracker.Trakg.dto.OverallAttendanceResponse;
 import com.Attendance_Tracker.Trakg.dto.SubjectAttendanceResponse;
@@ -45,19 +46,27 @@ public class AttendanceController {
                 attendanceService.getAttendanceByAssignment(assignmentId)
         );
     }
-    @GetMapping("/attendance/overall")
+    @GetMapping("/overall")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<OverallAttendanceResponse> getOverallAttendance() {
         return ResponseEntity.ok(
                 attendanceService.getOverallAttendance()
         );
     }
-    @GetMapping("/attendance/subjects")
+    @GetMapping("/subjects")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<SubjectAttendanceResponse>>
     getSubjectWiseAttendance() {
         return ResponseEntity.ok(
                 attendanceService.getSubjectWiseAttendance()
+        );
+    }
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<List<AttendanceRecordResponse>> getMyAttendance() {
+
+        return ResponseEntity.ok(
+                attendanceService.getMyAttendance()
         );
     }
 

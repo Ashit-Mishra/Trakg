@@ -101,12 +101,7 @@ const studentLinks = [
         to: "/student/attendance",
         icon: Clock,
         label: "Attendance Details",
-    },
-    {
-        to: "/student/profile",
-        icon: Settings,
-        label: "Profile",
-    },
+    }
 ];
 
 export function Sidebar() {

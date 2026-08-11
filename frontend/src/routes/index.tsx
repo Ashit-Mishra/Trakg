@@ -27,9 +27,9 @@ import { Profile } from "../pages/teacher/Profile";
 import { TakeAttendance } from "../pages/teacher/TakeAttendance";
 
 // Student
-import { StudentDashboard } from "../pages/student/Dashboard";
+import { StudentDashboard } from "../pages/student/StudentDashboard";
 import { AttendanceDetails } from "../pages/student/AttendanceDetails";
-import { StudentProfile } from "../pages/student/Profile";
+
 
 export function AppRoutes() {
     return (
@@ -230,17 +230,6 @@ export function AppRoutes() {
                     <RoleGuard allowedRoles={["STUDENT"]}>
                         <AppShell>
                             <AttendanceDetails />
-                        </AppShell>
-                    </RoleGuard>
-                }
-            />
-
-            <Route
-                path="/student/profile"
-                element={
-                    <RoleGuard allowedRoles={["STUDENT"]}>
-                        <AppShell>
-                            <StudentProfile />
                         </AppShell>
                     </RoleGuard>
                 }

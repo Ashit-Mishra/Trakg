@@ -1,9 +1,6 @@
 package com.Attendance_Tracker.Trakg.service;
 
-import com.Attendance_Tracker.Trakg.dto.AttendanceRequest;
-import com.Attendance_Tracker.Trakg.dto.OverallAttendanceResponse;
-import com.Attendance_Tracker.Trakg.dto.StudentAttendanceRequest;
-import com.Attendance_Tracker.Trakg.dto.SubjectAttendanceResponse;
+import com.Attendance_Tracker.Trakg.dto.*;
 import com.Attendance_Tracker.Trakg.entity.*;
 import com.Attendance_Tracker.Trakg.enums.AttendanceStatus;
 import com.Attendance_Tracker.Trakg.exception.DuplicateResourceException;
@@ -179,5 +176,66 @@ public class AttendanceService {
         }
         return response;
     }
+    public List<AttendanceRecordResponse> getMyAttendance() {
 
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String userId = authentication.getName();
+
+        Student student = studentRepository
+                .findByUserUserId(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Student not found."));
+
+        List<Attendance> attendanceList =
+                attendanceRepository.findByStudentId(student.getId());
+
+        return attendanceList.stream()
+                .map(attendance ->
+                        AttendanceRecordResponse.builder()
+                                .attendanceId(attendance.getId())
+
+                                .studentName(
+                                        attendance.getStudent()
+                                                .getUser()
+                                                .getName()
+                                )
+
+                                .rollNumber(
+                                        attendance.getStudent()
+                                                .getRollNumber()
+                                )
+
+                                .subjectCode(
+                                        attendance.getAssignment()
+                                                .getSubject()
+                                                .getSubjectCode()
+                                )
+
+                                .subjectName(
+                                        attendance.getAssignment()
+                                                .getSubject()
+                                                .getSubjectName()
+                                )
+
+                                .teacherName(
+                                        attendance.getAssignment()
+                                                .getTeacher()
+                                                .getUser()
+                                                .getName()
+                                )
+
+                                .status(
+                                        attendance.getStatus()
+                                )
+
+                                .attendanceDate(
+                                        attendance.getAttendanceDate()
+                                )
+
+                                .build()
+                )
+                .toList();
+    }
 }
