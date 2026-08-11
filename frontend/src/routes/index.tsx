@@ -1,8 +1,8 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
 
 import { AppShell } from "../components/layout/AppShell";
 import { RoleGuard } from "../components/layout/RoleGuard";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 
 // Auth
 import { Login } from "../pages/auth/Login";
@@ -22,9 +22,9 @@ import { Users } from "../pages/admin/Users";
 // Teacher
 import { TeacherDashboard } from "../pages/teacher/Dashboard";
 import { MyAssignments } from "../pages/teacher/MyAssignments";
-import { TakeAttendance } from "../pages/teacher/TakeAttendance";
 import { AttendanceHistory } from "../pages/teacher/AttendanceHistory";
-import { TeacherProfile } from "../pages/teacher/Profile";
+import { Profile } from "../pages/teacher/Profile";
+import { TakeAttendance } from "../pages/teacher/TakeAttendance";
 
 // Student
 import { StudentDashboard } from "../pages/student/Dashboard";
@@ -173,63 +173,43 @@ export function AppRoutes() {
             />
 
 
-            {/* ==================== TEACHER ==================== */}
+            {/* ======================== TEACHER ======================== */}
 
-            <Route
-                path="/teacher/dashboard"
-                element={
-                    <RoleGuard allowedRoles={["TEACHER"]}>
-                        <AppShell>
-                            <TeacherDashboard />
-                        </AppShell>
-                    </RoleGuard>
-                }
-            />
+<Route
+  path="/teacher"
+  element={
+    <RoleGuard allowedRoles={["TEACHER"]}>
+      <AppShell>
+        <Outlet />
+      </AppShell>
+    </RoleGuard>
+  }
+>
+  <Route
+    path="dashboard"
+    element={<TeacherDashboard />}
+  />
 
-            <Route
-                path="/teacher/assignments"
-                element={
-                    <RoleGuard allowedRoles={["TEACHER"]}>
-                        <AppShell>
-                            <MyAssignments />
-                        </AppShell>
-                    </RoleGuard>
-                }
-            />
+  <Route
+    path="assignments"
+    element={<MyAssignments />}
+  />
+  
+  <Route
+    path="attendance"
+    element={<TakeAttendance />}
+  />
 
-            <Route
-                path="/teacher/attendance"
-                element={
-                    <RoleGuard allowedRoles={["TEACHER"]}>
-                        <AppShell>
-                            <TakeAttendance />
-                        </AppShell>
-                    </RoleGuard>
-                }
-            />
+  <Route
+    path="history"
+    element={<AttendanceHistory />}
+  />
 
-            <Route
-                path="/teacher/history"
-                element={
-                    <RoleGuard allowedRoles={["TEACHER"]}>
-                        <AppShell>
-                            <AttendanceHistory />
-                        </AppShell>
-                    </RoleGuard>
-                }
-            />
-
-            <Route
-                path="/teacher/profile"
-                element={
-                    <RoleGuard allowedRoles={["TEACHER"]}>
-                        <AppShell>
-                            <TeacherProfile />
-                        </AppShell>
-                    </RoleGuard>
-                }
-            />
-
+  <Route
+    path="profile"
+    element={<Profile />}
+  />
+</Route>
 
             {/* ==================== STUDENT ==================== */}
 

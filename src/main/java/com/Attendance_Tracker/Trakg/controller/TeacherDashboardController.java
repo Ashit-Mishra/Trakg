@@ -4,6 +4,7 @@ import com.Attendance_Tracker.Trakg.dto.AttendanceRecordResponse;
 import com.Attendance_Tracker.Trakg.dto.TeacherAssignmentResponse;
 import com.Attendance_Tracker.Trakg.dto.TeacherProfileResponse;
 import com.Attendance_Tracker.Trakg.dto.UpdateAttendanceRequest;
+import com.Attendance_Tracker.Trakg.entity.Student;
 import com.Attendance_Tracker.Trakg.service.TeacherDashboardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,14 @@ public class TeacherDashboardController {
                         attendanceId,
                         request
                 )
+        );
+    }
+    @GetMapping("/assignments/{assignmentId}/students")
+    public ResponseEntity<List<Student>> getAssignmentStudents(
+            @PathVariable Long assignmentId) {
+
+        return ResponseEntity.ok(
+                teacherDashboardService.getAssignmentStudents(assignmentId)
         );
     }
 

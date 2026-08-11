@@ -2,6 +2,15 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { AuthUser } from "../types";
 
+interface User {
+  id: number;
+  userId: string;
+  name: string;
+  email: string;
+  role: "ADMIN" | "TEACHER" | "STUDENT";
+  enabled: boolean;
+}
+
 interface AuthState {
     user: AuthUser | null;
     token: string | null;

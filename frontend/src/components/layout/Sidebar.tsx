@@ -80,11 +80,6 @@ const teacherLinks = [
         label: "My Assignments",
     },
     {
-        to: "/teacher/attendance",
-        icon: Clock,
-        label: "Take Attendance",
-    },
-    {
         to: "/teacher/history",
         icon: Calendar,
         label: "Attendance History",

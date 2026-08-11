@@ -15,7 +15,6 @@ import com.Attendance_Tracker.Trakg.repository.TeacherRepository;
 import com.Attendance_Tracker.Trakg.repository.TeacherSubjectAssignmentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

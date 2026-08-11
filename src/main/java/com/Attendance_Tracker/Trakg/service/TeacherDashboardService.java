@@ -5,6 +5,7 @@ import com.Attendance_Tracker.Trakg.dto.TeacherAssignmentResponse;
 import com.Attendance_Tracker.Trakg.dto.TeacherProfileResponse;
 import com.Attendance_Tracker.Trakg.dto.UpdateAttendanceRequest;
 import com.Attendance_Tracker.Trakg.entity.Attendance;
+import com.Attendance_Tracker.Trakg.entity.Student;
 import com.Attendance_Tracker.Trakg.entity.Teacher;
 import com.Attendance_Tracker.Trakg.entity.TeacherSubjectAssignment;
 import com.Attendance_Tracker.Trakg.exception.ResourceNotFoundException;
@@ -151,5 +152,33 @@ public class TeacherDashboardService {
                 .status(updatedAttendance.getStatus())
                 .attendanceDate(updatedAttendance.getAttendanceDate())
                 .build();
+    }
+
+    public List<Student> getAssignmentStudents(Long assignmentId) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String userId = authentication.getName();
+
+        Teacher teacher = teacherRepository
+                .findByUserUserId(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Teacher not found."));
+
+        TeacherSubjectAssignment assignment =
+                assignmentRepository.findById(assignmentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Assignment not found."));
+
+        // Make sure this assignment belongs to the logged-in teacher
+        if (!assignment.getTeacher().getId().equals(teacher.getId())) {
+            throw new UnauthorizedException(
+                    "You are not authorized to access this assignment.");
+        }
+
+        return assignment.getClassSection()
+                .getStudents();
     }
 }
