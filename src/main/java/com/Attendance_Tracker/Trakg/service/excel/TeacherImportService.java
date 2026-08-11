@@ -82,8 +82,9 @@ public class TeacherImportService {
             String userId = ExcelReader.getString(row, 0);
             String name = ExcelReader.getString(row, 1);
             String email = ExcelReader.getString(row, 2);
-            String departmentCode = ExcelReader.getString(row, 3);
-            String designation = ExcelReader.getString(row, 4);
+            String password = ExcelReader.getString(row, 3);
+            String departmentCode = ExcelReader.getString(row, 4);
+            String designation = ExcelReader.getString(row, 5);
             if (userId.isBlank()
                     || name.isBlank()
                     || email.isBlank()
@@ -134,7 +135,7 @@ public class TeacherImportService {
                     .userId(userId)
                     .name(name)
                     .email(email)
-                    .password(passwordEncoder.encode(DEFAULT_PASSWORD))
+                    .password(passwordEncoder.encode(password))
                     .role(Role.TEACHER)
                     .enabled(true)
                     .build();

@@ -20,9 +20,10 @@ public class TemplateService {
         header.createCell(0).setCellValue("User ID");
         header.createCell(1).setCellValue("Name");
         header.createCell(2).setCellValue("Email");
-        header.createCell(3).setCellValue("Roll Number");
-        header.createCell(4).setCellValue("Class Section");
-        for (int i = 0; i < 5; i++) {
+        header.createCell(3).setCellValue("Password");
+        header.createCell(4).setCellValue("Roll Number");
+        header.createCell(5).setCellValue("Class Section");
+        for (int i = 0; i < 6; i++) {
             sheet.autoSizeColumn(i);
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -39,9 +40,10 @@ public class TemplateService {
         header.createCell(0).setCellValue("User ID");
         header.createCell(1).setCellValue("Name");
         header.createCell(2).setCellValue("Email");
-        header.createCell(3).setCellValue("Department");
-        header.createCell(4).setCellValue("Designation");
-        for (int i = 0; i < 5; i++) {
+        header.createCell(3).setCellValue("Password");
+        header.createCell(4).setCellValue("Department");
+        header.createCell(5).setCellValue("Designation");
+        for (int i = 0; i < 6; i++) {
             sheet.autoSizeColumn(i);
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

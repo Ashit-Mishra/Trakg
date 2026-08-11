@@ -93,8 +93,9 @@ public class StudentImportService {
                 String userId = ExcelReader.getString(row, 0);
                 String name = ExcelReader.getString(row, 1);
                 String email = ExcelReader.getString(row, 2);
-                String rollNumber = ExcelReader.getString(row, 3);
-                String classSectionName = ExcelReader.getString(row, 4);
+                String password = ExcelReader.getString(row, 3);
+                String rollNumber = ExcelReader.getString(row, 4);
+                String classSectionName = ExcelReader.getString(row, 5);
                 // Required field validation
                 if (userId.isBlank()
                         || name.isBlank()
@@ -156,7 +157,7 @@ public class StudentImportService {
                         .userId(userId)
                         .name(name)
                         .email(email)
-                        .password(passwordEncoder.encode("Password@123"))
+                        .password(passwordEncoder.encode(password))
                         .role(Role.STUDENT)
                         .enabled(true)
                         .build();
