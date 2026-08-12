@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   useMutation,
   useQuery,
@@ -34,8 +35,10 @@ import {
 
 import { DataTable } from "../../components/ui/DataTable";
 
+
 export function Teachers() {
   const queryClient = useQueryClient();
+
 
   // =========================
   // FORM STATE
@@ -59,11 +62,15 @@ export function Teachers() {
   const [designation, setDesignation] =
     useState("");
 
+  const [password, setPassword] =
+    useState("");
+
   const [search, setSearch] =
     useState("");
 
   const [error, setError] =
     useState("");
+
 
   // =========================
   // GET TEACHERS
@@ -78,6 +85,7 @@ export function Teachers() {
     queryFn: getTeachers,
   });
 
+
   // =========================
   // GET DEPARTMENTS
   // =========================
@@ -89,6 +97,7 @@ export function Teachers() {
     queryKey: ["departments"],
     queryFn: getDepartments,
   });
+
 
   // =========================
   // CREATE TEACHER
@@ -103,11 +112,13 @@ export function Teachers() {
           queryKey: ["teachers"],
         });
 
+        // Clear form
         setUserId("");
         setName("");
         setEmail("");
         setDepartmentId("");
         setDesignation("");
+        setPassword("");
 
         setError("");
         setShowForm(false);
@@ -126,6 +137,7 @@ export function Teachers() {
       },
     });
 
+
   // =========================
   // CREATE HANDLER
   // =========================
@@ -137,58 +149,103 @@ export function Teachers() {
 
     setError("");
 
+
+    // USER ID
+
     if (!userId.trim()) {
       setError(
         "User ID is required."
       );
+
       return;
     }
+
 
     if (userId.trim().length < 4) {
       setError(
         "User ID must be at least 4 characters."
       );
+
       return;
     }
+
+
+    // NAME
 
     if (!name.trim()) {
       setError(
         "Name is required."
       );
+
       return;
     }
+
+
+    // EMAIL
 
     if (!email.trim()) {
       setError(
         "Email is required."
       );
+
       return;
     }
+
+
+    // DEPARTMENT
 
     if (!departmentId) {
       setError(
         "Please select a department."
       );
+
       return;
     }
+
+
+    // DESIGNATION
 
     if (!designation.trim()) {
       setError(
         "Designation is required."
       );
+
       return;
     }
+
+
+    // PASSWORD
+
+    if (!password.trim()) {
+      setError(
+        "Password is required."
+      );
+
+      return;
+    }
+
+
+    if (password.length < 6) {
+      setError(
+        "Password must be at least 6 characters."
+      );
+
+      return;
+    }
+
+
+    // SEND REQUEST
 
     createMutation.mutate({
       userId: userId.trim(),
       name: name.trim(),
       email: email.trim(),
-      departmentId:
-        Number(departmentId),
-      designation:
-        designation.trim(),
+      departmentId: Number(departmentId),
+      designation: designation.trim(),
+      password: password,
     });
   };
+
 
   // =========================
   // IMPORT EXCEL
@@ -247,6 +304,7 @@ export function Teachers() {
     event.target.value = "";
   };
 
+
   // =========================
   // SEARCH
   // =========================
@@ -288,6 +346,7 @@ export function Teachers() {
           }
         )
       : [];
+
 
   // =========================
   // TABLE COLUMNS
@@ -387,6 +446,22 @@ export function Teachers() {
     },
   ];
 
+
+  // =========================
+  // RESET FORM
+  // =========================
+
+  const resetForm = () => {
+    setUserId("");
+    setName("");
+    setEmail("");
+    setDepartmentId("");
+    setDesignation("");
+    setPassword("");
+    setError("");
+  };
+
+
   // =========================
   // UI
   // =========================
@@ -394,7 +469,10 @@ export function Teachers() {
   return (
     <div className="space-y-6">
 
-      {/* HEADER */}
+
+      {/* =========================
+          HEADER
+         ========================= */}
 
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
@@ -408,7 +486,9 @@ export function Teachers() {
           </p>
         </div>
 
+
         <div className="flex flex-wrap gap-3">
+
 
           {/* TEMPLATE */}
 
@@ -425,6 +505,7 @@ export function Teachers() {
 
             Template
           </Button>
+
 
           {/* IMPORT */}
 
@@ -447,6 +528,7 @@ export function Teachers() {
             />
 
           </label>
+
 
           {/* ADD */}
 
@@ -482,9 +564,13 @@ export function Teachers() {
           </Button>
 
         </div>
+
       </div>
 
-      {/* ERROR */}
+
+      {/* =========================
+          ERROR
+         ========================= */}
 
       {error && (
         <div className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
@@ -498,7 +584,10 @@ export function Teachers() {
         </div>
       )}
 
-      {/* CREATE FORM */}
+
+      {/* =========================
+          CREATE FORM
+         ========================= */}
 
       {showForm && (
         <Card>
@@ -509,6 +598,7 @@ export function Teachers() {
             </CardTitle>
           </CardHeader>
 
+
           <CardContent>
 
             <form
@@ -517,6 +607,7 @@ export function Teachers() {
               }
               className="space-y-5"
             >
+
 
               {/* USER ID */}
 
@@ -538,6 +629,7 @@ export function Teachers() {
                 />
               </div>
 
+
               {/* NAME */}
 
               <div>
@@ -558,6 +650,7 @@ export function Teachers() {
                 />
               </div>
 
+
               {/* EMAIL */}
 
               <div>
@@ -577,6 +670,7 @@ export function Teachers() {
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
               </div>
+
 
               {/* DEPARTMENT */}
 
@@ -606,6 +700,7 @@ export function Teachers() {
                       : "Select department"}
                   </option>
 
+
                   {departments.map(
                     (
                       department: any
@@ -632,6 +727,7 @@ export function Teachers() {
                 </select>
               </div>
 
+
               {/* DESIGNATION */}
 
               <div>
@@ -654,6 +750,33 @@ export function Teachers() {
                 />
               </div>
 
+
+              {/* PASSWORD */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(event) =>
+                    setPassword(
+                      event.target.value
+                    )
+                  }
+                  placeholder="Enter login password"
+                  autoComplete="new-password"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+
+                <p className="mt-1 text-xs text-gray-500">
+                  This password will be used by the teacher to log in.
+                </p>
+              </div>
+
+
               {/* BUTTONS */}
 
               <div className="flex gap-3">
@@ -667,6 +790,7 @@ export function Teachers() {
                   Create Teacher
                 </Button>
 
+
                 <Button
                   type="button"
                   onClick={() => {
@@ -674,13 +798,7 @@ export function Teachers() {
                       false
                     );
 
-                    setUserId("");
-                    setName("");
-                    setEmail("");
-                    setDepartmentId("");
-                    setDesignation("");
-
-                    setError("");
+                    resetForm();
                   }}
                 >
                   Cancel
@@ -695,7 +813,10 @@ export function Teachers() {
         </Card>
       )}
 
-      {/* TEACHERS TABLE */}
+
+      {/* =========================
+          TEACHERS TABLE
+         ========================= */}
 
       <Card>
 
@@ -718,6 +839,7 @@ export function Teachers() {
             />
 
           </div>
+
 
           {/* TABLE */}
 

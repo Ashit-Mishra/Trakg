@@ -24,6 +24,7 @@ export interface TeacherRequest {
   email?: string;
   departmentId: number;
   designation: string;
+  password: string;
 }
 
 export const getTeachers = async (): Promise<Teacher[]> => {

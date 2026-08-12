@@ -16,11 +16,12 @@ export interface AuthResponse {
   role: Role;
 }
 export interface User {
-  id: string;
-  email: string;
+  id: number;
+  userId: string;
   name: string;
-  role: Role;
-  isActive: boolean;
+  email: string;
+  role: "ADMIN" | "TEACHER" | "STUDENT";
+  enabled: boolean;
 }
 
 

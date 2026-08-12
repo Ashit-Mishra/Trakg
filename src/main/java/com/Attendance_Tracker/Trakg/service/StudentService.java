@@ -44,7 +44,7 @@ public class StudentService {
                         new ResourceNotFoundException("Class section not found."));
         User user = User.builder()
                 .userId(request.getUserId())
-                .password(passwordEncoder.encode("Password@123"))
+                .password(passwordEncoder.encode(request.getPassword()))
                 .name(request.getName())
                 .email(request.getEmail())
                 .role(Role.STUDENT)

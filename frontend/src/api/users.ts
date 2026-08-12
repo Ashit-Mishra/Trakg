@@ -1,20 +1,55 @@
-import { apiClient } from './client';
-import { User } from '../types';
+import { apiClient } from "./client";
+import { User } from "../types";
+
+/* =========================================================
+   GET ALL USERS
+   ========================================================= */
 
 export const getUsers = async (): Promise<User[]> => {
-  const { data } = await apiClient.get('/api/admin/users');
+  const { data } = await apiClient.get<User[]>(
+    "/api/admin/users"
+  );
+
   return data;
 };
 
-export const getUser = async (userId: string): Promise<User> => {
-  const { data } = await apiClient.get(`/api/admin/users/${userId}`);
+
+/* =========================================================
+   GET USER
+   ========================================================= */
+
+export const getUser = async (
+  userId: string
+): Promise<User> => {
+  const { data } = await apiClient.get<User>(
+    `/api/admin/users/${userId}`
+  );
+
   return data;
 };
 
-export const enableUser = async (userId: string): Promise<void> => {
-  await apiClient.put(`/api/admin/users/${userId}/enable`);
+
+/* =========================================================
+   ENABLE USER
+   ========================================================= */
+
+export const enableUser = async (
+  userId: string
+): Promise<void> => {
+  await apiClient.put(
+    `/api/admin/users/${userId}/enable`
+  );
 };
 
-export const disableUser = async (userId: string): Promise<void> => {
-  await apiClient.put(`/api/admin/users/${userId}/disable`);
+
+/* =========================================================
+   DISABLE USER
+   ========================================================= */
+
+export const disableUser = async (
+  userId: string
+): Promise<void> => {
+  await apiClient.put(
+    `/api/admin/users/${userId}/disable`
+  );
 };

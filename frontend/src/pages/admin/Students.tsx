@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+
 import {
   useMutation,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+
 import {
   Plus,
   Download,
@@ -23,6 +25,7 @@ import {
 import { getClassSections } from "../../api/class-sections";
 
 import { Button } from "../../components/ui/Button";
+
 import {
   Card,
   CardHeader,
@@ -32,8 +35,10 @@ import {
 
 import { DataTable } from "../../components/ui/DataTable";
 
+
 export function Students() {
   const queryClient = useQueryClient();
+
 
   // =========================
   // FORM STATE
@@ -47,8 +52,12 @@ export function Students() {
   const [rollNumber, setRollNumber] = useState("");
   const [classSectionId, setClassSectionId] = useState("");
 
+  // NEW: PASSWORD
+  const [password, setPassword] = useState("");
+
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
+
 
   // =========================
   // GET STUDENTS
@@ -63,6 +72,7 @@ export function Students() {
     queryFn: getStudents,
   });
 
+
   // =========================
   // GET CLASS SECTIONS
   // =========================
@@ -74,6 +84,7 @@ export function Students() {
     queryKey: ["class-sections"],
     queryFn: getClassSections,
   });
+
 
   // =========================
   // CREATE STUDENT
@@ -93,6 +104,7 @@ export function Students() {
       setEmail("");
       setRollNumber("");
       setClassSectionId("");
+      setPassword("");
 
       setError("");
       setShowForm(false);
@@ -108,6 +120,7 @@ export function Students() {
     },
   });
 
+
   // =========================
   // CREATE STUDENT
   // =========================
@@ -119,10 +132,12 @@ export function Students() {
 
     setError("");
 
+
     if (!userId.trim()) {
       setError("User ID is required.");
       return;
     }
+
 
     if (userId.trim().length < 4) {
       setError(
@@ -131,20 +146,24 @@ export function Students() {
       return;
     }
 
+
     if (!name.trim()) {
       setError("Name is required.");
       return;
     }
+
 
     if (!email.trim()) {
       setError("Email is required.");
       return;
     }
 
+
     if (!rollNumber.trim()) {
       setError("Roll number is required.");
       return;
     }
+
 
     if (!classSectionId) {
       setError(
@@ -153,14 +172,34 @@ export function Students() {
       return;
     }
 
+
+    // NEW: PASSWORD VALIDATION
+    if (!password.trim()) {
+      setError("Password is required.");
+      return;
+    }
+
+
+    if (password.length < 6) {
+      setError(
+        "Password must be at least 6 characters."
+      );
+      return;
+    }
+
+
     createMutation.mutate({
       userId: userId.trim(),
       name: name.trim(),
       email: email.trim(),
       rollNumber: rollNumber.trim(),
       classSectionId: Number(classSectionId),
+
+      // NEW
+      password: password,
     });
   };
+
 
   // =========================
   // IMPORT EXCEL
@@ -213,6 +252,7 @@ export function Students() {
     event.target.value = "";
   };
 
+
   // =========================
   // SEARCH
   // =========================
@@ -250,6 +290,7 @@ export function Students() {
         }
       )
     : [];
+
 
   // =========================
   // TABLE COLUMNS
@@ -347,6 +388,7 @@ export function Students() {
     },
   ];
 
+
   // =========================
   // UI
   // =========================
@@ -388,6 +430,7 @@ export function Students() {
             Template
           </Button>
 
+
           {/* IMPORT */}
 
           <label className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90">
@@ -407,6 +450,7 @@ export function Students() {
             />
 
           </label>
+
 
           {/* ADD STUDENT */}
 
@@ -441,6 +485,7 @@ export function Students() {
         </div>
       </div>
 
+
       {/* =========================
           ERROR
       ========================= */}
@@ -454,6 +499,7 @@ export function Students() {
 
         </div>
       )}
+
 
       {/* =========================
           CREATE FORM
@@ -500,6 +546,7 @@ export function Students() {
                 </p>
               </div>
 
+
               {/* NAME */}
 
               <div>
@@ -519,6 +566,7 @@ export function Students() {
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
               </div>
+
 
               {/* EMAIL */}
 
@@ -540,6 +588,7 @@ export function Students() {
                 />
               </div>
 
+
               {/* ROLL NUMBER */}
 
               <div>
@@ -560,7 +609,8 @@ export function Students() {
                 />
               </div>
 
-              {/* CLASS SECTION DROPDOWN */}
+
+              {/* CLASS SECTION */}
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -608,6 +658,33 @@ export function Students() {
                 </select>
               </div>
 
+
+              {/* PASSWORD */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(event) =>
+                    setPassword(
+                      event.target.value
+                    )
+                  }
+                  placeholder="Enter login password"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+
+                <p className="mt-1 text-xs text-gray-500">
+                  This password will be used by the
+                  student to log in.
+                </p>
+              </div>
+
+
               {/* FORM BUTTONS */}
 
               <div className="flex gap-3">
@@ -631,6 +708,7 @@ export function Students() {
                     setEmail("");
                     setRollNumber("");
                     setClassSectionId("");
+                    setPassword("");
 
                     setError("");
                   }}
@@ -646,6 +724,7 @@ export function Students() {
 
         </Card>
       )}
+
 
       {/* =========================
           STUDENTS TABLE
@@ -670,6 +749,7 @@ export function Students() {
               className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
+
 
           {/* TABLE */}
 

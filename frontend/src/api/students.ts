@@ -1,5 +1,10 @@
 import { apiClient } from "./client";
 
+
+/* =========================================================
+   STUDENT
+   ========================================================= */
+
 export interface Student {
   id: number;
   rollNumber: string;
@@ -29,52 +34,83 @@ export interface Student {
   };
 }
 
+
+/* =========================================================
+   CREATE STUDENT REQUEST
+   ========================================================= */
+
 export interface StudentRequest {
   userId: string;
   name: string;
   email: string;
   rollNumber: string;
   classSectionId: number;
+  password: string;
 }
 
+
+/* =========================================================
+   GET ALL STUDENTS
+   ========================================================= */
+
 export const getStudents = async (): Promise<Student[]> => {
-  const response = await apiClient.get(
+  const response = await apiClient.get<Student[]>(
     "/api/admin/students"
   );
 
   return response.data;
 };
 
+
+/* =========================================================
+   GET STUDENT
+   ========================================================= */
+
 export const getStudent = async (
   id: number
 ): Promise<Student> => {
-  const response = await apiClient.get(
+  const response = await apiClient.get<Student>(
     `/api/admin/students/${id}`
   );
 
   return response.data;
 };
 
+
+/* =========================================================
+   GET STUDENTS BY CLASS SECTION
+   ========================================================= */
+
 export const getStudentsByClassSection = async (
   classSectionId: number
 ): Promise<Student[]> => {
-  const response = await apiClient.get(
+  const response = await apiClient.get<Student[]>(
     `/api/admin/students/class-section/${classSectionId}`
   );
 
   return response.data;
 };
 
+
+/* =========================================================
+   CREATE STUDENT
+   ========================================================= */
+
 export const createStudent = async (
   request: StudentRequest
 ): Promise<Student> => {
-  const response = await apiClient.post(
+  const response = await apiClient.post<Student>(
     "/api/admin/students",
     request
   );
 
   return response.data;
 };
+
+
+/* =========================================================
+   DOWNLOAD STUDENT TEMPLATE
+   ========================================================= */
 
 export const downloadStudentTemplate = async () => {
   const response = await apiClient.get(
@@ -101,6 +137,11 @@ export const downloadStudentTemplate = async () => {
 
   window.URL.revokeObjectURL(url);
 };
+
+
+/* =========================================================
+   IMPORT STUDENTS
+   ========================================================= */
 
 export const importStudents = async (
   file: File

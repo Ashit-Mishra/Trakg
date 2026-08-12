@@ -24,8 +24,9 @@ public class StudentRequest {
     private String email;
     @NotBlank
     private String rollNumber;
-    @NotBlank
     private String classSectionName;
     @NotNull
     private Long classSectionId;
+    @NotBlank
+    private String password;
 }
