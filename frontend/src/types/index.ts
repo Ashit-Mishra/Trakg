@@ -61,7 +61,7 @@ export interface Subject {
 export interface ClassSection {
     id: number;
     sectionName: string;
-    semester: Semester;
+    semester?: Semester;
     department: Department;
 }
 
