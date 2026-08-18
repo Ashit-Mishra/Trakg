@@ -1,6 +1,6 @@
 # Trakg
 
-# Link: https://trakg.up.railway.app/
+Link: https://trakg.up.railway.app/
 
 A role-based Attendance Management System built with Spring Boot. The application provides secure authentication, academic management, teacher assignment, and attendance tracking for educational institutions.
 
